@@ -30,34 +30,45 @@
 <body class="bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 min-h-screen text-slate-100 font-sans selection:bg-indigo-500 selection:text-white">
 
     <!-- Navbar -->
-    <nav class="sticky top-0 z-40 glass-dark border-b border-indigo-500/20 px-4 sm:px-8 py-3.5 shadow-xl">
-        <div class="max-w-7xl mx-auto flex items-center justify-between gap-3">
-            <div class="flex items-center gap-2.5 cursor-pointer select-none" onclick="switchView('catalog')">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                    <i class="fa-solid fa-graduation-cap text-lg text-white"></i>
+    <nav class="sticky top-0 z-40 glass-dark border-b border-indigo-500/20 px-3 sm:px-8 py-3 shadow-xl">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-2">
+            <!-- Logo -->
+            <div class="flex items-center gap-2 cursor-pointer select-none" onclick="switchView('catalog')">
+                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                    <i class="fa-solid fa-graduation-cap text-base sm:text-lg text-white"></i>
                 </div>
-                <span class="text-xl sm:text-2xl font-black tracking-tight bg-gradient-to-r from-white via-indigo-200 to-purple-300 bg-clip-text text-transparent">UniShare</span>
+                <span class="text-lg sm:text-2xl font-black tracking-tight bg-gradient-to-r from-white via-indigo-200 to-purple-300 bg-clip-text text-transparent">UniShare</span>
             </div>
 
-            <div class="flex items-center gap-2 sm:gap-3">
-                <button id="topup-nav-btn" onclick="openTopupModal()" class="hidden px-3 py-2 rounded-xl bg-emerald-500/20 border border-emerald-500/40 hover:bg-emerald-500/30 text-emerald-300 transition-all duration-300 text-xs sm:text-sm font-semibold flex items-center gap-1.5">
-                    <i class="fa-solid fa-wallet"></i> <span class="hidden md:inline">Hisob to‘ldirish</span>
+            <!-- Boshqaruv tugmalari va Balans -->
+            <div class="flex items-center gap-1.5 sm:gap-3">
+                <!-- Foydalanuvchi Balansi (Telefonda ham, Kompyuterda ham Aniq Ko'rinadi) -->
+                <div id="user-balance-badge" class="hidden flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/40">
+                    <i class="fa-solid fa-wallet text-emerald-400 text-xs sm:text-sm"></i>
+                    <div class="text-left">
+                        <div class="text-[9px] text-slate-400 uppercase tracking-wider font-semibold leading-none hidden sm:block">Balans</div>
+                        <div id="current-user-balance" class="text-xs sm:text-sm font-extrabold font-mono text-emerald-300 leading-tight">0 UZS</div>
+                    </div>
+                </div>
+
+                <button id="topup-nav-btn" onclick="openTopupModal()" class="hidden px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white transition text-xs sm:text-sm font-semibold flex items-center gap-1 shadow-md shadow-emerald-600/30">
+                    <i class="fa-solid fa-plus text-xs"></i> <span class="hidden md:inline">To‘ldirish</span>
                 </button>
 
-                <button id="my-orders-btn" onclick="openMyOrdersModal()" class="hidden px-3 py-2 rounded-xl bg-purple-500/20 border border-purple-500/40 hover:bg-purple-500/30 text-purple-300 transition-all duration-300 text-xs sm:text-sm font-semibold flex items-center gap-1.5">
-                    <i class="fa-solid fa-box-open"></i> <span class="hidden md:inline">Xaridlarim</span>
+                <button id="my-orders-btn" onclick="openMyOrdersModal()" class="hidden px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-purple-500/20 border border-purple-500/40 hover:bg-purple-500/30 text-purple-300 transition text-xs sm:text-sm font-semibold flex items-center gap-1">
+                    <i class="fa-solid fa-box-open text-xs"></i> <span class="hidden md:inline">Xaridlarim</span>
                 </button>
 
-                <button id="post-btn" onclick="openModal('post-modal')" class="hidden px-3 py-2 rounded-xl bg-indigo-600/30 border border-indigo-500/40 hover:bg-indigo-600 transition-all duration-300 text-xs sm:text-sm font-semibold flex items-center gap-1.5">
+                <button id="post-btn" onclick="openModal('post-modal')" class="hidden px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-indigo-600/30 border border-indigo-500/40 hover:bg-indigo-600 transition text-xs sm:text-sm font-semibold flex items-center gap-1">
                     <i class="fa-solid fa-plus text-indigo-400"></i> <span class="hidden md:inline">E'lon berish</span>
                 </button>
 
-                <button id="admin-nav-btn" onclick="openAdminPanel()" class="hidden px-3 py-2 rounded-xl bg-amber-500/20 border border-amber-500/40 hover:bg-amber-500/30 text-amber-300 transition-all duration-300 text-xs sm:text-sm font-semibold flex items-center gap-1.5">
-                    <i class="fa-solid fa-shield-halved"></i> <span class="hidden md:inline">Admin</span>
+                <button id="admin-nav-btn" onclick="openAdminPanel()" class="hidden px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-amber-500/20 border border-amber-500/40 hover:bg-amber-500/30 text-amber-300 transition text-xs sm:text-sm font-semibold flex items-center gap-1">
+                    <i class="fa-solid fa-shield-halved text-xs"></i> <span class="hidden md:inline">Admin</span>
                 </button>
 
                 <div id="auth-actions">
-                    <button onclick="openModal('auth-modal')" class="px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold text-xs sm:text-sm hover:shadow-lg hover:shadow-indigo-500/40 transition">
+                    <button onclick="openModal('auth-modal')" class="px-3.5 py-1.5 sm:px-5 sm:py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold text-xs sm:text-sm hover:shadow-lg hover:shadow-indigo-500/40 transition">
                         Kirish
                     </button>
                 </div>
@@ -72,7 +83,7 @@
             <div class="max-w-2xl relative z-10">
                 <span class="px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-xs font-semibold uppercase tracking-wider mb-3 inline-block">Talabalar Ekotizimi</span>
                 <h1 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight mb-3">Talabalar uchun qulay, tezkor va xavfsiz birja</h1>
-                <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">Kitoblar, elektron konspektlar, texnikalar va xizmatlar. To‘g‘ridan-to‘g‘ri qurilmadan yuklash va qulay to‘lovlar.</p>
+                <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">Kitoblar, elektron konspektlar va talabalar xizmatlari. To‘g‘ridan-to‘g‘ri qurilmadan yuklash va Telegram orqali bir zumda balans to‘ldirish.</p>
             </div>
             <div class="absolute right-4 -bottom-6 opacity-20 lg:opacity-30 motion-float pointer-events-none">
                 <i class="fa-solid fa-cube text-8xl sm:text-9xl text-indigo-400"></i>
@@ -405,7 +416,6 @@
                     </div>
                 </div>
 
-                <!-- 1. Qurilmadan sotiladigan faylni yuklash -->
                 <div class="p-3.5 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 space-y-2">
                     <label class="text-xs text-indigo-300 font-bold flex items-center gap-1.5">
                         <i class="fa-solid fa-file-arrow-up"></i> Sotilayotgan Kitob yoki Fayl (Qurilmadan)
@@ -415,7 +425,6 @@
                     <input id="post_file_url" type="text" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs focus:border-indigo-500 focus:outline-none" placeholder="https://drive.google.com/...">
                 </div>
 
-                <!-- 2. Muqova rasmi -->
                 <div class="p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
                     <label class="text-xs text-slate-400 font-medium flex items-center gap-1.5">
                         <i class="fa-regular fa-image"></i> Muqova rasmi (Qurilmadan yoki URL)
@@ -449,12 +458,39 @@
             if (saved) {
                 currentUser = JSON.parse(saved);
                 renderUserUI();
+                startBalanceAutoSync(); // Balansni fonda yangilab turish
             }
             loadProducts();
             fetchPublicSettings();
         });
 
-        // Sozlamalarni (kartani) barcha foydalanuvchilar uchun yuklab olish
+        // Balansni avtomatik yangilash (Har 6 soniyada tekshiradi, Telegramda tasdiqlansa avtomatik oshadi)
+        function startBalanceAutoSync() {
+            if (!currentUser) return;
+            setInterval(async () => {
+                if (!currentUser) return;
+                try {
+                    const res = await fetch(`/api/get_user_info.php?user_id=${currentUser.id}`);
+                    const data = await res.json();
+                    if (data.status === 'success' && data.user) {
+                        currentUser.balance = data.user.balance;
+                        localStorage.setItem('unishare_user', JSON.stringify(currentUser));
+                        updateBalanceDisplay();
+                    }
+                } catch(e) {}
+            }, 6000);
+        }
+
+        function updateBalanceDisplay() {
+            if (!currentUser) return;
+            const balBadge = document.getElementById('user-balance-badge');
+            const balText = document.getElementById('current-user-balance');
+            if (balBadge && balText) {
+                balBadge.classList.remove('hidden');
+                balText.innerText = parseFloat(currentUser.balance).toLocaleString() + ' UZS';
+            }
+        }
+
         async function fetchPublicSettings() {
             try {
                 const res = await fetch('/api/admin_actions.php', {
@@ -547,6 +583,7 @@
                         renderUserUI();
                         loadProducts();
                         fetchPublicSettings();
+                        startBalanceAutoSync();
                     }
                 } else {
                     alert(data.message || 'Xatolik yuz berdi!');
@@ -569,12 +606,11 @@
                 ordersBtn.classList.remove('hidden');
                 if (currentUser.role === 'admin') adminNavBtn.classList.remove('hidden');
 
+                updateBalanceDisplay();
+
                 authActions.innerHTML = `
-                    <div class="flex items-center gap-2 sm:gap-3">
-                        <div class="text-right hidden sm:block">
-                            <div class="text-xs font-bold text-white">${currentUser.full_name}</div>
-                            <div class="text-[11px] text-emerald-400 font-mono font-bold">${parseFloat(currentUser.balance).toLocaleString()} UZS</div>
-                        </div>
+                    <div class="flex items-center gap-1.5 sm:gap-2">
+                        <span class="text-xs font-bold text-white hidden md:inline truncate max-w-[120px]">${currentUser.full_name}</span>
                         <button onclick="logout()" title="Chiqish" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-900 hover:bg-rose-500/20 hover:text-rose-400 border border-slate-700 flex items-center justify-center transition">
                             <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
                         </button>
@@ -585,8 +621,9 @@
                 topupBtn.classList.add('hidden');
                 ordersBtn.classList.add('hidden');
                 adminNavBtn.classList.add('hidden');
+                document.getElementById('user-balance-badge').classList.add('hidden');
                 authActions.innerHTML = `
-                    <button onclick="openModal('auth-modal')" class="px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold text-xs sm:text-sm hover:shadow-lg hover:shadow-indigo-500/40 transition">
+                    <button onclick="openModal('auth-modal')" class="px-3.5 py-1.5 sm:px-5 sm:py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold text-xs sm:text-sm hover:shadow-lg hover:shadow-indigo-500/40 transition">
                         Kirish
                     </button>
                 `;
@@ -758,7 +795,7 @@
             if (data.status === 'success') {
                 currentUser.balance = data.new_balance;
                 localStorage.setItem('unishare_user', JSON.stringify(currentUser));
-                renderUserUI();
+                updateBalanceDisplay();
                 alert(data.message);
                 loadProducts();
             } else {
