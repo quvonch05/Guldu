@@ -72,7 +72,7 @@
             <div class="max-w-2xl relative z-10">
                 <span class="px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-xs font-semibold uppercase tracking-wider mb-3 inline-block">Talabalar Ekotizimi</span>
                 <h1 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight mb-3">Talabalar uchun qulay, tezkor va xavfsiz birja</h1>
-                <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">Kitoblar, elektron konspektlar, texnikalar va xizmatlar. To‘g‘ridan-to‘g‘ri qurilmadan yuklash va Telegram orqali tezkor to‘lov.</p>
+                <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">Kitoblar, elektron konspektlar, texnikalar va xizmatlar. To‘g‘ridan-to‘g‘ri qurilmadan yuklash va qulay to‘lovlar.</p>
             </div>
             <div class="absolute right-4 -bottom-6 opacity-20 lg:opacity-30 motion-float pointer-events-none">
                 <i class="fa-solid fa-cube text-8xl sm:text-9xl text-indigo-400"></i>
@@ -154,10 +154,10 @@
                         <h3 class="text-base font-bold text-amber-300 flex items-center gap-2">
                             <i class="fa-solid fa-credit-card"></i> Admin Kartasi & Payout
                         </h3>
-                        <p class="text-[11px] text-slate-400 mt-1">Talabalar to‘lov qilishi va komissiyani yechib olish uchun</p>
+                        <p class="text-[11px] text-slate-400 mt-1">Talabalardan to‘lov qabul qiluvchi shaxsiy kartangiz</p>
                         <div class="space-y-2 mt-3">
                             <div>
-                                <label class="text-[10px] text-slate-400">Karta raqami (16 xona)</label>
+                                <label class="text-[10px] text-slate-400">Karta raqami (16 xonali)</label>
                                 <input id="admin_card_number" type="text" maxlength="19" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs font-mono focus:outline-none" placeholder="8600 •••• •••• ••••">
                             </div>
                             <div>
@@ -278,7 +278,7 @@
         </div>
     </div>
 
-    <!-- Modal: Hisobni to'ldirish (P2P + Kvitansiya skrinshoti) -->
+    <!-- Modal: Hisobni to'ldirish (Click, Payme, Uzum Bank + Karta nusxalash) -->
     <div id="topup-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center hidden p-4">
         <div class="glass-dark w-full max-w-md p-6 sm:p-8 rounded-3xl border border-emerald-500/30 shadow-2xl relative max-h-[90vh] overflow-y-auto custom-scroll">
             <button onclick="closeModal('topup-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -288,10 +288,15 @@
             <p class="text-xs text-slate-400 text-center mb-4">Kartaga to‘lab, chekni yuklang — balans bir zumda to‘ldiriladi</p>
 
             <div class="space-y-3.5">
-                <!-- Admin Karta Ma'lumoti -->
-                <div class="p-3.5 rounded-2xl bg-slate-900 border border-emerald-500/30 space-y-1 text-center">
+                <!-- Admin Karta Ma'lumoti va Nusxa Olish -->
+                <div class="p-3.5 rounded-2xl bg-slate-900 border border-emerald-500/30 space-y-1.5 text-center relative group">
                     <span class="text-[10px] uppercase font-bold text-slate-400">Admin Qabul Qiluvchi Kartasi</span>
-                    <div id="topup-card-display" class="font-mono font-bold text-sm sm:text-base text-emerald-300 tracking-wider">8600 •••• •••• ••••</div>
+                    <div class="flex items-center justify-center gap-2">
+                        <div id="topup-card-display" class="font-mono font-bold text-base sm:text-lg text-emerald-300 tracking-wider">8600 •••• •••• ••••</div>
+                        <button onclick="copyCardNumber()" title="Kartani nusxalash" class="px-2 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500 hover:text-white transition text-xs font-semibold flex items-center gap-1">
+                            <i class="fa-regular fa-copy"></i> <span id="copy-btn-text">Nusxa</span>
+                        </button>
+                    </div>
                     <div id="topup-holder-display" class="text-xs text-slate-400">Admin Qabul Qiluvchi</div>
                 </div>
 
@@ -300,21 +305,27 @@
                     <input id="topup_amount" oninput="updatePayLinks()" type="number" step="1000" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:border-emerald-500 focus:outline-none" placeholder="Masalan: 50000">
                 </div>
 
-                <!-- Tezkor tugmalar -->
+                <!-- Tezkor summalar -->
                 <div class="flex gap-2">
                     <button onclick="setTopupAmount(20000)" class="flex-1 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs hover:border-emerald-500 transition">+20k</button>
                     <button onclick="setTopupAmount(50000)" class="flex-1 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs hover:border-emerald-500 transition">+50k</button>
                     <button onclick="setTopupAmount(100000)" class="flex-1 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs hover:border-emerald-500 transition">+100k</button>
                 </div>
 
-                <!-- Ilovalarda bitta bosishda to'lash -->
-                <div class="grid grid-cols-2 gap-2 pt-1">
-                    <a id="click-deeplink" href="#" target="_blank" class="py-2 px-3 rounded-xl bg-sky-600/30 border border-sky-500/50 hover:bg-sky-600 text-sky-300 hover:text-white text-xs font-bold text-center transition flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-mobile-screen"></i> Click'da to‘lash
-                    </a>
-                    <a id="payme-deeplink" href="#" target="_blank" class="py-2 px-3 rounded-xl bg-teal-600/30 border border-teal-500/50 hover:bg-teal-600 text-teal-300 hover:text-white text-xs font-bold text-center transition flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-mobile-screen"></i> Payme'da to‘lash
-                    </a>
+                <!-- Ilovalarda bitta bosishda to'lash: Click, Payme, Uzum Bank -->
+                <div class="space-y-1.5 pt-1">
+                    <div class="text-[11px] text-slate-400 font-medium">To‘lov ilovasini tanlang:</div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <a id="click-deeplink" href="#" target="_blank" onclick="checkCardBeforePay(event)" class="py-2 px-1.5 rounded-xl bg-sky-600/20 border border-sky-500/40 hover:bg-sky-600 text-sky-300 hover:text-white text-xs font-bold text-center transition flex flex-col items-center justify-center gap-1">
+                            <i class="fa-solid fa-bolt text-sm"></i> Click
+                        </a>
+                        <a id="payme-deeplink" href="#" target="_blank" onclick="checkCardBeforePay(event)" class="py-2 px-1.5 rounded-xl bg-teal-600/20 border border-teal-500/40 hover:bg-teal-600 text-teal-300 hover:text-white text-xs font-bold text-center transition flex flex-col items-center justify-center gap-1">
+                            <i class="fa-solid fa-credit-card text-sm"></i> Payme
+                        </a>
+                        <a id="uzum-deeplink" href="#" target="_blank" onclick="openUzumPay(event)" class="py-2 px-1.5 rounded-xl bg-purple-600/20 border border-purple-500/40 hover:bg-purple-600 text-purple-300 hover:text-white text-xs font-bold text-center transition flex flex-col items-center justify-center gap-1">
+                            <i class="fa-solid fa-bag-shopping text-sm"></i> Uzum Bank
+                        </a>
+                    </div>
                 </div>
 
                 <!-- Chek skrinshotini yuklash -->
@@ -431,7 +442,7 @@
         let isRegister = false;
         let allProducts = [];
         let currentFilter = 'Barchasi';
-        let currentAdminCard = '8600 •••• •••• ••••';
+        let currentAdminCard = '';
 
         document.addEventListener('DOMContentLoaded', () => {
             const saved = localStorage.getItem('unishare_user');
@@ -440,17 +451,58 @@
                 renderUserUI();
             }
             loadProducts();
-            fetchSettings();
+            fetchPublicSettings();
         });
 
-        async function fetchSettings() {
+        // Sozlamalarni (kartani) barcha foydalanuvchilar uchun yuklab olish
+        async function fetchPublicSettings() {
             try {
-                const res = await fetch('/api/get_products.php');
-                // Admin kartasini olish
-                if (currentUser && currentUser.role === 'admin') {
-                    // stats yuklanganda olinadi
+                const res = await fetch('/api/admin_actions.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'get_stats', admin_id: currentUser ? currentUser.id : 1 })
+                });
+                const data = await res.json();
+                if (data.settings && data.settings.admin_card_number) {
+                    currentAdminCard = data.settings.admin_card_number.replace(/\s+/g, '');
+                    document.getElementById('topup-card-display').innerText = formatCard(currentAdminCard);
+                    if (data.settings.admin_card_holder) {
+                        document.getElementById('topup-holder-display').innerText = data.settings.admin_card_holder;
+                    }
                 }
             } catch(e) {}
+        }
+
+        function formatCard(num) {
+            if (!num) return '8600 •••• •••• ••••';
+            return num.replace(/(\d{4})(?=\d)/g, '$1 ');
+        }
+
+        function copyCardNumber() {
+            if (!currentAdminCard || currentAdminCard.length < 16) {
+                return alert('Admin kartasi hali kiritilmagan!');
+            }
+            navigator.clipboard.writeText(currentAdminCard);
+            const btnText = document.getElementById('copy-btn-text');
+            btnText.innerText = 'Ko‘chirildi!';
+            setTimeout(() => { btnText.innerText = 'Nusxa'; }, 2000);
+        }
+
+        function checkCardBeforePay(e) {
+            if (!currentAdminCard || currentAdminCard.length < 16) {
+                e.preventDefault();
+                alert('Admin kartasi hali to‘liq kiritilmagan! Iltimos, admin bilan bog‘laning.');
+            }
+        }
+
+        function openUzumPay(e) {
+            e.preventDefault();
+            if (!currentAdminCard || currentAdminCard.length < 16) {
+                return alert('Admin kartasi hali kiritilmagan!');
+            }
+            copyCardNumber();
+            alert('Karta raqami nusxalandi! Uzum Bank ilovasida "O‘tkazmalar" bo‘limiga qo‘ying.');
+            window.location.href = 'https://uzumbank.uz';
         }
 
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
@@ -494,6 +546,7 @@
                         closeModal('auth-modal');
                         renderUserUI();
                         loadProducts();
+                        fetchPublicSettings();
                     }
                 } else {
                     alert(data.message || 'Xatolik yuz berdi!');
@@ -548,10 +601,10 @@
             loadProducts();
         }
 
-        // Topup boshqaruvi
         function openTopupModal() {
             if (!currentUser) return alert('Avval tizimga kiring!');
             openModal('topup-modal');
+            fetchPublicSettings();
             updatePayLinks();
         }
 
@@ -858,8 +911,8 @@
                     if (data.settings) {
                         if (data.settings.admin_card_number) {
                             document.getElementById('admin_card_number').value = data.settings.admin_card_number;
-                            currentAdminCard = data.settings.admin_card_number;
-                            document.getElementById('topup-card-display').innerText = currentAdminCard;
+                            currentAdminCard = data.settings.admin_card_number.replace(/\s+/g, '');
+                            document.getElementById('topup-card-display').innerText = formatCard(currentAdminCard);
                         }
                         if (data.settings.admin_card_holder) {
                             document.getElementById('admin_card_holder').value = data.settings.admin_card_holder;
@@ -960,6 +1013,7 @@
             const data = await res.json();
             alert(data.message || 'Saqlandi');
             openAdminPanel();
+            fetchPublicSettings();
         }
 
         async function withdrawAdminProfit() {
