@@ -2,7 +2,6 @@
 // index.php
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-// API so'rovlarini to'g'ri faylga yo'naltirish
 if (strpos($uri, '/api/') === 0) {
     $file = __DIR__ . $uri;
     if (file_exists($file)) {
@@ -15,5 +14,5 @@ if (strpos($uri, '/api/') === 0) {
     }
 }
 
-// Bosh sahifa va statik sahifalar uchun
+// Frontend HTML fayli
 require __DIR__ . '/public/index.html';

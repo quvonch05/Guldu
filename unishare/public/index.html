@@ -1,189 +1,656 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html lang="uz" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UniShare — Talabalar Bozor Tizimi</title>
+    <title>UniShare — Talabalar Bozor & To‘lov Platformasi</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
+                    colors: {
+                        brand: { 50: '#eef2ff', 100: '#e0e7ff', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca' }
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col justify-between">
+<body class="bg-[#F8FAFC] text-slate-800 font-sans min-h-screen flex flex-col justify-between antialiased">
+
+    <!-- Toast Xabarnomalar -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
     <div>
         <!-- Navbar -->
-        <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
-            <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <span class="text-2xl font-black text-indigo-600 tracking-tight">UniShare</span>
-                    <span class="text-xs bg-indigo-100 text-indigo-800 font-semibold px-2 py-0.5 rounded">Talaba Portali</span>
-                </div>
-                <div class="flex items-center space-x-5">
-                    <div class="text-right">
-                        <div class="text-xs text-slate-400">Joriy hisob:</div>
-                        <div class="font-bold text-emerald-600 text-base" id="balance-display">Yuklanmoqda...</div>
+        <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
+            <div class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
+                
+                <div class="flex items-center gap-3 cursor-pointer" onclick="switchView('market')">
+                    <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center text-white shadow-md font-bold text-xl">
+                        U
                     </div>
-                    <button onclick="topUpBalance()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2.5 rounded-lg shadow-sm transition">
-                        + To‘ldirish (Click)
-                    </button>
-                    <button onclick="openEscrowModal()" class="border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-semibold px-3 py-2.5 rounded-lg transition">
-                        Kodni tasdiqlash
-                    </button>
+                    <div>
+                        <span class="text-xl font-extrabold tracking-tight text-slate-900">Uni<span class="text-brand-600">Share</span></span>
+                        <span class="hidden sm:inline-block ml-2 px-2 py-0.5 text-[11px] font-semibold bg-emerald-50 text-emerald-600 rounded-full border border-emerald-200">Talaba Portali</span>
+                    </div>
+                </div>
+
+                <!-- Right Navigation -->
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <!-- Faqat kirmaganlar uchun -->
+                    <div id="guest-nav" class="flex items-center gap-2">
+                        <button onclick="openAuthModal('login')" class="text-xs sm:text-sm font-semibold px-4 py-2.5 text-slate-600 hover:text-slate-900 transition">Kirish</button>
+                        <button onclick="openAuthModal('register')" class="bg-brand-600 hover:bg-brand-700 text-white text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-xl shadow-sm transition">Ro‘yxatdan o‘tish</button>
+                    </div>
+
+                    <!-- Kirgan foydalanuvchilar uchun -->
+                    <div id="user-nav" class="hidden flex items-center gap-3">
+                        <!-- Balans -->
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl px-3 sm:px-4 py-1.5 flex items-center gap-2.5">
+                            <span class="text-emerald-500 font-bold text-sm">💰</span>
+                            <div>
+                                <div class="text-[10px] uppercase font-bold text-slate-400">Balans</div>
+                                <div id="balance-display" class="text-xs sm:text-sm font-bold text-slate-900">0 so‘m</div>
+                            </div>
+                        </div>
+
+                        <!-- Balans to'ldirish -->
+                        <button onclick="toggleModal('topup-modal', true)" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition">
+                            + To‘ldirish
+                        </button>
+
+                        <!-- Profil tugmasi -->
+                        <button onclick="switchView('profile')" class="border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-semibold px-3 py-2 rounded-xl transition">
+                            Mening profilim
+                        </button>
+
+                        <!-- Admin Panel tugmasi (faqat adminlarga) -->
+                        <button id="admin-panel-btn" onclick="switchView('admin')" class="hidden bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold px-3 py-2 rounded-xl transition">
+                            Admin Panel
+                        </button>
+
+                        <!-- Chiqish -->
+                        <button onclick="logout()" title="Tizimdan chiqish" class="text-slate-400 hover:text-rose-500 p-2 transition">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                        </button>
+                    </div>
                 </div>
             </div>
         </header>
 
-        <!-- Asosiy qism -->
-        <main class="max-w-6xl mx-auto px-4 py-8">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-                <div>
-                    <h1 class="text-2xl font-bold text-slate-900">Materiallar va Xizmatlar</h1>
-                    <p class="text-sm text-slate-500">Universitet talabalari uchun konspektlar, kitoblar va tezkor chop etish xizmati.</p>
-                </div>
-                <div class="flex space-x-2">
-                    <button class="px-3.5 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-medium">Barchasi</button>
+        <!-- VIEW 1: ASOSIY MARKETPLACE -->
+        <main id="market-view" class="max-w-7xl mx-auto px-4 py-10">
+            <!-- Hero Banner -->
+            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-8 sm:p-12 mb-10 shadow-xl">
+                <div class="relative z-10 max-w-2xl">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-semibold mb-4 border border-indigo-400/20">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> GulDU Talabalar tarmog‘i
+                    </span>
+                    <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-3">Talabalararo xizmatlar va materiallar birjasi</h1>
+                    <p class="text-slate-300 text-sm sm:text-base leading-relaxed">Sifatli konspektlar, kitoblar xaridi va TTJ da tezkor chop etish xizmatidan onlayn foydalaning.</p>
                 </div>
             </div>
 
-            <!-- Mahsulotlar kartasi -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="products-container">
-                <div class="col-span-3 text-center py-12 text-slate-400 text-sm">Materiallar yuklanmoqda...</div>
+            <!-- Filtrlar va Qidiruv -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                <div class="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0" id="category-tabs">
+                    <button onclick="filterCategory('all')" data-cat="all" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-brand-600 text-white shadow-sm">Barchasi</button>
+                    <button onclick="filterCategory('digital_note')" data-cat="digital_note" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-white border border-slate-200 text-slate-600 hover:bg-slate-50">Konspektlar</button>
+                    <button onclick="filterCategory('print_service')" data-cat="print_service" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-white border border-slate-200 text-slate-600 hover:bg-slate-50">Dorm-Print</button>
+                    <button onclick="filterCategory('book_escrow')" data-cat="book_escrow" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-white border border-slate-200 text-slate-600 hover:bg-slate-50">Kitoblar</button>
+                </div>
+
+                <div class="relative w-full md:w-80">
+                    <input type="text" id="search-input" onkeyup="renderProducts()" placeholder="Qidirish..." class="w-full bg-white border border-slate-200 rounded-xl pl-4 pr-4 py-2.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500">
+                </div>
+            </div>
+
+            <!-- Mahsulotlar kartochkalari -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="products-container"></div>
+        </main>
+
+        <!-- VIEW 2: SHAXSIY PROFIL -->
+        <main id="profile-view" class="hidden max-w-5xl mx-auto px-4 py-10">
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">Shaxsiy Kabinet</h2>
+                    <p class="text-xs text-slate-500" id="profile-user-info"></p>
+                </div>
+                <button onclick="switchView('market')" class="text-xs font-semibold text-brand-600 hover:underline">← Asosiy sahifaga qaytish</button>
+            </div>
+
+            <!-- Profil Ichki bo'limlari -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Yangi e'lon berish -->
+                <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                    <h3 class="font-bold text-base text-slate-900 mb-4">+ Yangi e’lon berish</h3>
+                    <form onsubmit="handleCreateProduct(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Kategoriya</label>
+                            <select id="new-prod-type" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs">
+                                <option value="digital_note">PDF Konspekt / Material</option>
+                                <option value="print_service">Dorm-Print Chop etish</option>
+                                <option value="book_escrow">Kitob (Escrow savdosi)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Sarlavha</label>
+                            <input type="text" id="new-prod-title" required placeholder="Masalan: Fizika oraliq konspekt" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Tavsif</label>
+                            <textarea id="new-prod-desc" rows="2" placeholder="Qisqacha ma'lumot..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Narxi (so‘m)</label>
+                            <input type="number" id="new-prod-price" required min="500" step="500" placeholder="10000" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold">
+                        </div>
+                        <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 rounded-xl text-xs transition">Joylashtirish</button>
+                    </form>
+                </div>
+
+                <!-- Mening xaridlarim & Mening e'lonlarim -->
+                <div class="md:col-span-2 space-y-6">
+                    <!-- Xarid qilinganlar -->
+                    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                        <h3 class="font-bold text-base text-slate-900 mb-4">Mening xaridlarim</h3>
+                        <div id="my-purchases-container" class="space-y-3">
+                            <div class="text-xs text-slate-400">Yuklanmoqda...</div>
+                        </div>
+                    </div>
+
+                    <!-- Joylagan e'lonlarim -->
+                    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                        <h3 class="font-bold text-base text-slate-900 mb-4">Mening e’lonlarim</h3>
+                        <div id="my-products-container" class="space-y-3">
+                            <div class="text-xs text-slate-400">Yuklanmoqda...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- VIEW 3: ADMIN PANEL -->
+        <main id="admin-view" class="hidden max-w-7xl mx-auto px-4 py-10">
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">Administrator Paneli</h2>
+                    <p class="text-xs text-slate-500">UniShare platformasining umumiy auditi va monitoringi</p>
+                </div>
+                <button onclick="switchView('market')" class="text-xs font-semibold text-brand-600 hover:underline">← Asosiy vitrinaga qaytish</button>
+            </div>
+
+            <!-- Statistika Metrikalari -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200">
+                    <div class="text-[11px] font-bold text-slate-400 uppercase">Foydalanuvchilar</div>
+                    <div id="admin-stat-users" class="text-2xl font-extrabold text-slate-900 mt-1">0</div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200">
+                    <div class="text-[11px] font-bold text-slate-400 uppercase">Faol E’lonlar</div>
+                    <div id="admin-stat-products" class="text-2xl font-extrabold text-slate-900 mt-1">0</div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200">
+                    <div class="text-[11px] font-bold text-slate-400 uppercase">Jami To‘lovlar</div>
+                    <div id="admin-stat-revenue" class="text-2xl font-extrabold text-emerald-600 mt-1">0 so‘m</div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200">
+                    <div class="text-[11px] font-bold text-slate-400 uppercase">Platforma Foydasi</div>
+                    <div id="admin-stat-commission" class="text-2xl font-extrabold text-indigo-600 mt-1">0 so‘m</div>
+                </div>
+            </div>
+
+            <!-- Foydalanuvchilar va Tranzaksiyalar Jadvallari -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Tranzaksiyalar -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <h4 class="font-bold text-sm text-slate-900 mb-4">Oxirgi To‘lovlar (Click)</h4>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead>
+                                <tr class="text-slate-400 border-b">
+                                    <th class="pb-2">Foydalanuvchi</th>
+                                    <th class="pb-2">Summa</th>
+                                    <th class="pb-2">Status</th>
+                                    <th class="pb-2">Vaqt</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-tx-table"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Ro'yxatdan o'tganlar -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <h4 class="font-bold text-sm text-slate-900 mb-4">Foydalanuvchilar Ro‘yxati</h4>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead>
+                                <tr class="text-slate-400 border-b">
+                                    <th class="pb-2">Ism</th>
+                                    <th class="pb-2">Talaba ID</th>
+                                    <th class="pb-2">Balans</th>
+                                    <th class="pb-2">Rol</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-users-table"></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
 
-    <footer class="bg-white border-t py-6 text-center text-xs text-slate-400">
-        UniShare — Talabalar uchun o‘zaro yordam va onlayn to‘lov platformasi
-    </footer>
+    <!-- MODAL: Avtorizatsiya (Login & Register) -->
+    <div id="auth-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm hidden p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100">
+            <div class="flex justify-between items-center mb-5">
+                <h3 id="auth-modal-title" class="text-lg font-bold text-slate-900">Tizimga kirish</h3>
+                <button onclick="toggleModal('auth-modal', false)" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form" onsubmit="handleAuthLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Talaba ID (yoki Login)</label>
+                    <input type="text" id="login-id" required placeholder="Masalan: STU1001" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Parol</label>
+                    <input type="password" id="login-password" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                </div>
+                <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 rounded-xl text-xs transition">Kirish</button>
+                <div class="text-center text-xs text-slate-500 pt-2">
+                    Hisobingiz yo‘qmi? <a href="#" onclick="openAuthModal('register')" class="text-brand-600 font-bold hover:underline">Ro‘yxatdan o‘ting</a>
+                </div>
+            </form>
+
+            <!-- Register Form -->
+            <form id="register-form" onsubmit="handleAuthRegister(event)" class="space-y-3 hidden">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">F.I.SH (To‘liq ism)</label>
+                    <input type="text" id="reg-name" required placeholder="Quvonchbek Baratov" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Talaba ID / Hemis ID</label>
+                    <input type="text" id="reg-id" required placeholder="STU1002" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Telefon raqam</label>
+                    <input type="text" id="reg-phone" required placeholder="+998901234567" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Parol</label>
+                    <input type="password" id="reg-password" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs transition">Hisob yaratish</button>
+                <div class="text-center text-xs text-slate-500 pt-2">
+                    Akkauntingiz bormi? <a href="#" onclick="openAuthModal('login')" class="text-brand-600 font-bold hover:underline">Kirish</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: To'ldirish -->
+    <div id="topup-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm hidden p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-base font-bold text-slate-900">Click orqali to‘ldirish</h3>
+                <button onclick="toggleModal('topup-modal', false)" class="text-slate-400 text-lg font-bold">&times;</button>
+            </div>
+            <input type="number" id="topup-amount" value="30000" min="1000" step="5000" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold mb-4">
+            <button onclick="proceedToClick()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 rounded-xl text-xs transition">Click to‘loviga o‘tish</button>
+        </div>
+    </div>
 
     <script>
-        const CURRENT_USER_ID = 1; // Standart sinov talabasi ID-si
+        // Foydalanuvchi Sessiyasi (localStorage)
+        let currentUser = JSON.parse(localStorage.getItem('unishare_user') || 'null');
+        let allProducts = [];
+        let currentFilter = 'all';
 
-        // 1. Foydalanuvchi ma'lumotlarini yuklash
-        async function loadUser() {
-            try {
-                const res = await fetch('/api/auth.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'get_user', user_id: CURRENT_USER_ID })
-                });
-                const data = await res.json();
-                if(data.status === 'success') {
-                    document.getElementById('balance-display').innerText = Number(data.user.balance).toLocaleString('uz-UZ') + " so‘m";
+        // Modalni ochish/yopish
+        function toggleModal(id, show) {
+            document.getElementById(id).classList.toggle('hidden', !show);
+        }
+
+        function showToast(msg, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `pointer-events-auto px-4 py-3 rounded-xl shadow-xl border text-xs font-semibold flex items-center gap-2 ${
+                type === 'success' ? 'bg-white border-emerald-200 text-emerald-800' : 'bg-white border-rose-200 text-rose-800'
+            }`;
+            toast.innerHTML = `<span>${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3500);
+        }
+
+        // Tizim holatini yangilash (UI Sync)
+        function syncAuthState() {
+            if (currentUser) {
+                document.getElementById('guest-nav').classList.add('hidden');
+                document.getElementById('user-nav').classList.remove('hidden');
+                document.getElementById('balance-display').innerText = Number(currentUser.balance).toLocaleString('uz-UZ') + " so‘m";
+                
+                if (currentUser.role === 'admin') {
+                    document.getElementById('admin-panel-btn').classList.remove('hidden');
+                } else {
+                    document.getElementById('admin-panel-btn').classList.add('hidden');
                 }
-            } catch (e) {
-                console.error("Balansni yuklab bo‘lmadi", e);
+            } else {
+                document.getElementById('guest-nav').classList.remove('hidden');
+                document.getElementById('user-nav').classList.add('hidden');
+                document.getElementById('admin-panel-btn').classList.add('hidden');
             }
         }
 
-        // 2. Mahsulotlarni chiqarish
-        async function loadProducts() {
+        // Ko'rinishlarni almashtirish (Market, Profil, Admin)
+        function switchView(viewName) {
+            document.getElementById('market-view').classList.add('hidden');
+            document.getElementById('profile-view').classList.add('hidden');
+            document.getElementById('admin-view').classList.add('hidden');
+
+            if (viewName === 'market') {
+                document.getElementById('market-view').classList.remove('hidden');
+            } else if (viewName === 'profile') {
+                if (!currentUser) return openAuthModal('login');
+                document.getElementById('profile-view').classList.remove('hidden');
+                loadProfileData();
+            } else if (viewName === 'admin') {
+                if (!currentUser || currentUser.role !== 'admin') return alert("Faqat admin uchun");
+                document.getElementById('admin-view').classList.remove('hidden');
+                loadAdminData();
+            }
+        }
+
+        // Autentifikatsiya modali
+        function openAuthModal(mode) {
+            toggleModal('auth-modal', true);
+            if (mode === 'login') {
+                document.getElementById('auth-modal-title').innerText = "Tizimga kirish";
+                document.getElementById('login-form').classList.remove('hidden');
+                document.getElementById('register-form').classList.add('hidden');
+            } else {
+                document.getElementById('auth-modal-title').innerText = "Ro‘yxatdan o‘tish";
+                document.getElementById('login-form').classList.add('hidden');
+                document.getElementById('register-form').classList.remove('hidden');
+            }
+        }
+
+        // Login so'rovi
+        async function handleAuthLogin(e) {
+            e.preventDefault();
+            const student_id = document.getElementById('login-id').value.trim();
+            const password = document.getElementById('login-password').value;
+
+            const res = await fetch('/api/auth.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'login', student_id, password })
+            });
+            const data = await res.json();
+
+            if (data.status === 'success') {
+                currentUser = data.user;
+                localStorage.setItem('unishare_user', JSON.stringify(currentUser));
+                toggleModal('auth-modal', false);
+                syncAuthState();
+                showToast("Xush kelibsiz, " + currentUser.full_name);
+            } else {
+                showToast(data.message, 'error');
+            }
+        }
+
+        // Register so'rovi
+        async function handleAuthRegister(e) {
+            e.preventDefault();
+            const full_name = document.getElementById('reg-name').value.trim();
+            const student_id = document.getElementById('reg-id').value.trim();
+            const phone = document.getElementById('reg-phone').value.trim();
+            const password = document.getElementById('reg-password').value;
+
+            const res = await fetch('/api/auth.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'register', full_name, student_id, phone, password })
+            });
+            const data = await res.json();
+
+            if (data.status === 'success') {
+                showToast("Ro‘yxatdan o‘tildi! Endi tizimga kiring.");
+                openAuthModal('login');
+            } else {
+                showToast(data.message, 'error');
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('unishare_user');
+            currentUser = null;
+            syncAuthState();
+            switchView('market');
+            showToast("Tizimdan chiqildi");
+        }
+
+        // Mahsulotlarni olish
+        async function fetchProducts() {
             try {
                 const res = await fetch('/api/get_products.php');
                 const data = await res.json();
-                const container = document.getElementById('products-container');
-                container.innerHTML = '';
-
-                if (data.status === 'success' && data.data.length > 0) {
-                    data.data.forEach(p => {
-                        let typeBadge = '';
-                        let btnText = 'Xarid qilish';
-                        let btnColor = 'bg-indigo-600 hover:bg-indigo-700';
-
-                        if (p.type === 'digital_note') {
-                            typeBadge = '<span class="px-2 py-0.5 bg-blue-50 text-blue-700 text-[11px] font-semibold rounded">PDF Konspekt</span>';
-                            btnText = 'Yuklab olish';
-                        } else if (p.type === 'print_service') {
-                            typeBadge = '<span class="px-2 py-0.5 bg-purple-50 text-purple-700 text-[11px] font-semibold rounded">Dorm-Print</span>';
-                            btnText = 'Chop etishga berish';
-                        } else {
-                            typeBadge = '<span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[11px] font-semibold rounded">Escrow Kitob</span>';
-                            btnText = 'Xavfsiz xarid';
-                            btnColor = 'bg-emerald-600 hover:bg-emerald-700';
-                        }
-
-                        container.innerHTML += `
-                            <div class="bg-white rounded-xl border border-slate-200 p-5 flex flex-col justify-between hover:shadow-md transition">
-                                <div>
-                                    <div class="mb-2">${typeBadge}</div>
-                                    <h3 class="font-bold text-slate-800 text-base mb-1.5">${p.title}</h3>
-                                    <p class="text-xs text-slate-500 mb-4 leading-relaxed">${p.description || ''}</p>
-                                </div>
-                                <div class="border-t border-slate-100 pt-3 flex items-center justify-between">
-                                    <span class="font-bold text-slate-900">${Number(p.price).toLocaleString('uz-UZ')} so‘m</span>
-                                    <button onclick="buyProduct(${p.id})" class="${btnColor} text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition">
-                                        ${btnText}
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-                    });
-                } else {
-                    container.innerHTML = '<div class="col-span-3 text-center py-8 text-slate-400">Hozircha hech qanday e’lon yo‘q.</div>';
+                if (data.status === 'success') {
+                    allProducts = data.data;
+                    renderProducts();
                 }
-            } catch (e) {
+            } catch(e) {
                 console.error(e);
             }
         }
 
-        // 3. Xarid qilish
-        async function buyProduct(productId) {
-            if(!confirm("Ushbu xaridni tasdiqlaysizmi?")) return;
+        function renderProducts() {
+            const container = document.getElementById('products-container');
+            const search = document.getElementById('search-input').value.toLowerCase();
 
-            try {
-                const res = await fetch('/api/buy_product.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ buyer_id: CURRENT_USER_ID, product_id: productId })
+            const filtered = allProducts.filter(p => {
+                const matchCat = currentFilter === 'all' || p.type === currentFilter;
+                const matchSearch = p.title.toLowerCase().includes(search);
+                return matchCat && matchSearch;
+            });
+
+            container.innerHTML = '';
+            filtered.forEach(p => {
+                let badge = p.type === 'digital_note' ? 'PDF Konspekt' : (p.type === 'print_service' ? 'Dorm-Print' : 'Escrow Kitob');
+                container.innerHTML += `
+                    <div class="bg-white rounded-2xl border border-slate-200 p-5 flex flex-col justify-between hover:shadow-lg transition">
+                        <div>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600 mb-2 inline-block">${badge}</span>
+                            <h3 class="font-bold text-slate-800 text-sm mb-1">${p.title}</h3>
+                            <p class="text-xs text-slate-500 mb-4">${p.description || ''}</p>
+                        </div>
+                        <div class="border-t pt-3 flex items-center justify-between">
+                            <span class="font-extrabold text-slate-900 text-sm">${Number(p.price).toLocaleString()} so‘m</span>
+                            <button onclick="buyProduct(${p.id})" class="bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg transition">
+                                Xarid qilish
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        async function buyProduct(id) {
+            if (!currentUser) return openAuthModal('login');
+            if (!confirm("Ushbu xaridni amalga oshirishni xohlaysizmi?")) return;
+
+            const res = await fetch('/api/buy_product.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ buyer_id: currentUser.id, product_id: id })
+            });
+            const data = await res.json();
+
+            if (data.status === 'success') {
+                showToast(data.message);
+                refreshUserBalance();
+                if (data.download_url) window.location.href = data.download_url;
+            } else {
+                showToast(data.message, 'error');
+            }
+        }
+
+        async function refreshUserBalance() {
+            if (!currentUser) return;
+            const res = await fetch('/api/auth.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'get_user', user_id: currentUser.id })
+            });
+            const data = await res.json();
+            if (data.status === 'success') {
+                currentUser = data.user;
+                localStorage.setItem('unishare_user', JSON.stringify(currentUser));
+                syncAuthState();
+            }
+        }
+
+        // Profil ma'lumotlarini yuklash
+        async function loadProfileData() {
+            document.getElementById('profile-user-info').innerText = `${currentUser.full_name} (${currentUser.student_id}) | Tel: ${currentUser.phone}`;
+
+            // Xaridlarni olish
+            const resPurchases = await fetch('/api/profile.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'get_purchases', user_id: currentUser.id })
+            });
+            const purData = await resPurchases.json();
+            const purContainer = document.getElementById('my-purchases-container');
+            purContainer.innerHTML = '';
+
+            if (purData.data && purData.data.length > 0) {
+                purData.data.forEach(item => {
+                    purContainer.innerHTML += `
+                        <div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs">
+                            <div>
+                                <div class="font-bold text-slate-800">${item.title}</div>
+                                <div class="text-[11px] text-slate-400">Holat: ${item.escrow_status} ${item.secret_qr_code ? ' | Kod: ' + item.secret_qr_code : ''}</div>
+                            </div>
+                            ${item.file_path ? `<a href="/api/download.php?user_id=${currentUser.id}&product_id=${item.product_id}" class="bg-indigo-50 text-brand-600 font-bold px-3 py-1.5 rounded-lg border border-brand-200">Yuklab olish</a>` : ''}
+                        </div>
+                    `;
                 });
-                const result = await res.json();
-
-                if (result.status === 'success') {
-                    alert(result.message);
-                    loadUser();
-                    if (result.download_url) {
-                        window.location.href = result.download_url;
-                    }
-                } else {
-                    alert("Xatolik: " + result.message);
-                }
-            } catch (err) {
-                alert("Server bilan ulanishda xatolik yuz berdi");
+            } else {
+                purContainer.innerHTML = '<div class="text-xs text-slate-400">Hozircha xaridlar yo‘q</div>';
             }
-        }
 
-        // 4. Balans to'ldirish (Click havolasi)
-        function topUpBalance() {
-            const amount = prompt("Qancha summa to‘ldirmoqchisiz (so‘m)?", "30000");
-            if (amount && Number(amount) > 1000) {
-                const serviceId = "12345"; // Click Merchant Service ID
-                const returnUrl = encodeURIComponent(window.location.origin);
-                window.location.href = `https://my.click.uz/services/pay?service_id=${serviceId}&merchant_id=${serviceId}&amount=${amount}&transaction_param=${CURRENT_USER_ID}&return_url=${returnUrl}`;
-            }
-        }
+            // O'z e'lonlarini olish
+            const resProd = await fetch('/api/profile.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'get_my_products', user_id: currentUser.id })
+            });
+            const myProdData = await resProd.json();
+            const prodContainer = document.getElementById('my-products-container');
+            prodContainer.innerHTML = '';
 
-        // 5. Sotuvchi uchun Escrow kodini kiritish oynasi
-        async function openEscrowModal() {
-            const code = prompt("Xaridordan olgan 8 belgili maxfiy kodni kiriting:");
-            if (!code) return;
-
-            try {
-                const res = await fetch('/api/confirm_order.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ seller_id: CURRENT_USER_ID, secret_code: code })
+            if (myProdData.data && myProdData.data.length > 0) {
+                myProdData.data.forEach(item => {
+                    prodContainer.innerHTML += `
+                        <div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs">
+                            <span class="font-semibold text-slate-800">${item.title}</span>
+                            <span class="font-bold text-slate-900">${Number(item.price).toLocaleString()} so‘m</span>
+                        </div>
+                    `;
                 });
-                const result = await res.json();
-                alert(result.message);
-                if (result.status === 'success') {
-                    loadUser();
-                }
-            } catch (e) {
-                alert("Xatolik yuz berdi");
+            } else {
+                prodContainer.innerHTML = '<div class="text-xs text-slate-400">Siz hali e’lon bermagansiz</div>';
             }
         }
 
-        // Boshlang'ich yuklash
-        loadUser();
-        loadProducts();
+        // Yangi e'lon yaratish
+        async function handleCreateProduct(e) {
+            e.preventDefault();
+            const title = document.getElementById('new-prod-title').value;
+            const description = document.getElementById('new-prod-desc').value;
+            const price = document.getElementById('new-prod-price').value;
+            const type = document.getElementById('new-prod-type').value;
+
+            const res = await fetch('/api/profile.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'create_product', user_id: currentUser.id, title, description, price, type })
+            });
+            const data = await res.json();
+
+            if (data.status === 'success') {
+                showToast(data.message);
+                e.target.reset();
+                loadProfileData();
+                fetchProducts();
+            } else {
+                showToast(data.message, 'error');
+            }
+        }
+
+        // Admin statistikasini yuklash
+        async function loadAdminData() {
+            const res = await fetch('/api/admin.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ admin_id: currentUser.id, action: 'get_stats' })
+            });
+            const data = await res.json();
+
+            if (data.status === 'success') {
+                document.getElementById('admin-stat-users').innerText = data.stats.total_users;
+                document.getElementById('admin-stat-products').innerText = data.stats.total_products;
+                document.getElementById('admin-stat-revenue').innerText = Number(data.stats.total_revenue).toLocaleString() + " so‘m";
+                document.getElementById('admin-stat-commission').innerText = Number(data.stats.total_commission).toLocaleString() + " so‘m";
+
+                // Tranzaksiyalar
+                const txTable = document.getElementById('admin-tx-table');
+                txTable.innerHTML = '';
+                data.recent_transactions.forEach(t => {
+                    txTable.innerHTML += `
+                        <tr class="border-b border-slate-100">
+                            <td class="py-2.5">${t.full_name}</td>
+                            <td class="py-2.5 font-bold text-emerald-600">${Number(t.amount).toLocaleString()} so‘m</td>
+                            <td class="py-2.5"><span class="px-2 py-0.5 rounded text-[10px] ${t.state === 2 ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${t.state === 2 ? 'To‘langan' : 'Kutilmoqda'}</span></td>
+                            <td class="py-2.5 text-slate-400">${t.created_at.slice(0, 16)}</td>
+                        </tr>
+                    `;
+                });
+
+                // Foydalanuvchilar
+                const uTable = document.getElementById('admin-users-table');
+                uTable.innerHTML = '';
+                data.users.forEach(u => {
+                    uTable.innerHTML += `
+                        <tr class="border-b border-slate-100">
+                            <td class="py-2.5 font-medium">${u.full_name}</td>
+                            <td class="py-2.5 text-slate-500">${u.student_id}</td>
+                            <td class="py-2.5 font-bold">${Number(u.balance).toLocaleString()}</td>
+                            <td class="py-2.5"><span class="px-1.5 py-0.5 rounded text-[10px] ${u.role === 'admin' ? 'bg-purple-100 text-purple-700 font-bold' : 'bg-slate-100 text-slate-600'}">${u.role}</span></td>
+                        </tr>
+                    `;
+                });
+            }
+        }
+
+        function proceedToClick() {
+            const amount = document.getElementById('topup-amount').value;
+            if (!currentUser) return openAuthModal('login');
+            const serviceId = "12345";
+            const returnUrl = encodeURIComponent(window.location.origin);
+            window.location.href = `https://my.click.uz/services/pay?service_id=${serviceId}&merchant_id=${serviceId}&amount=${amount}&transaction_param=${currentUser.id}&return_url=${returnUrl}`;
+        }
+
+        // Boshlang'ich chaqiruvlar
+        syncAuthState();
+        fetchProducts();
     </script>
 </body>
 </html>

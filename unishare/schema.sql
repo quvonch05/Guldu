@@ -1,3 +1,14 @@
+-- ========================================================
+-- UniShare Platformasi — To‘liq Ma’lumotlar Bazasi Sxemasi
+-- ========================================================
+
+-- Bazani yaratish (agar mavjud bo'lmasa)
+CREATE DATABASE IF NOT EXISTS unishare_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE unishare_db;
+
+-- --------------------------------------------------------
+-- 1. Foydalanuvchilar (Talabalar va Adminlar)
+-- --------------------------------------------------------
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     full_name VARCHAR(100) NOT NULL,
@@ -5,9 +16,13 @@ CREATE TABLE IF NOT EXISTS users (
     phone VARCHAR(20) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     balance DECIMAL(12, 2) DEFAULT 0.00,
+    role ENUM('student', 'admin') DEFAULT 'student',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
+-- --------------------------------------------------------
+-- 2. Materiallar va Xizmatlar (Konspekt, Kitob, Print)
+-- --------------------------------------------------------
 CREATE TABLE IF NOT EXISTS products (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -21,6 +36,9 @@ CREATE TABLE IF NOT EXISTS products (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
+-- --------------------------------------------------------
+-- 3. Buyurtmalar va Xavfsiz Bitimlar (Escrow)
+-- --------------------------------------------------------
 CREATE TABLE IF NOT EXISTS orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
     buyer_id INT NOT NULL,
@@ -36,26 +54,40 @@ CREATE TABLE IF NOT EXISTS orders (
     FOREIGN KEY (product_id) REFERENCES products(id)
 ) ENGINE=InnoDB;
 
+-- --------------------------------------------------------
+-- 4. To'lov shlyuzi tranzaksiyalari (Click Merchant Billing)
+-- --------------------------------------------------------
 CREATE TABLE IF NOT EXISTS billing_transactions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     order_id INT NULL,
     click_trans_id BIGINT NULL,
     amount DECIMAL(12, 2) NOT NULL,
-    state INT DEFAULT 0,
+    state INT DEFAULT 0, -- 0: Kutilmoqda, 1: Tayyorlandi, 2: To‘landi, -1: Bekor qilindi
     sign_time VARCHAR(50) NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)
 ) ENGINE=InnoDB;
 
--- Test uchun dastlabki talaba va mahsulotlar (Dastlabki ma'lumot)
-INSERT INTO users (id, full_name, student_id, phone, password_hash, balance) 
-VALUES (1, 'Talaba Sinov', 'STU1001', '+998901234567', '$2y$10$w8TKnPZ0tWkU4u34T/kRMezHwKq0g01.gq4tI.3tG/RjY6sPZ/gS2', 50000.00)
+-- ========================================================
+-- Dastlabki Sinov Ma’lumotlari (Seed Data)
+-- ========================================================
+
+-- A. Standart Foydalanuvchilar (Admin va Sinov Talabasi)
+-- Eslatma: Hash parollar BCRYPT orqali yaratilgan:
+-- 'admin123' paroli uchun: $2y$10$w8TKnPZ0tWkU4u34T/kRMezHwKq0g01.gq4tI.3tG/RjY6sPZ/gS2
+-- 'student123' paroli uchun: $2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi
+
+INSERT INTO users (id, full_name, student_id, phone, password_hash, balance, role) 
+VALUES 
+(1, 'Tizim Administratori', 'ADMIN01', '+998900000000', '$2y$10$w8TKnPZ0tWkU4u34T/kRMezHwKq0g01.gq4tI.3tG/RjY6sPZ/gS2', 0.00, 'admin'),
+(2, 'Talaba Sinov', 'STU1001', '+998901234567', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 50000.00, 'student')
 ON DUPLICATE KEY UPDATE id=id;
 
-INSERT INTO products (user_id, title, description, price, file_path, type) 
+-- B. Standart Namunaviy E’lonlar
+INSERT INTO products (id, user_id, title, description, price, file_path, type, status) 
 VALUES 
-(1, 'Ma''lumotlar bazasi (MySQL/PostgreSQL) — Oraliq nazorat to‘liq konspekti', '5-semestr uchun tayyorlangan savol-javoblar va amaliy kodlar.', 12000.00, 'db_note.pdf', 'digital_note'),
-(1, 'Tezkor A4 chop etish (3-TTJ, 312-xona)', 'LaserJet printer. Oq-qora chop etish. Narxi bitta varaq uchun.', 400.00, NULL, 'print_service'),
-(1, 'Algoritmlar va ma''lumotlar tuzilmasi (C++) — Darslik kitob', 'Holati yangidek. O''tgan yili olingan.', 35000.00, NULL, 'book_escrow')
+(1, 1, 'Ma''lumotlar bazasi (MySQL/PostgreSQL) — Oraliq nazorat to‘liq konspekti', '5-semestr uchun tayyorlangan savol-javoblar, SQL so‘rov namunalari bilan birga.', 12000.00, 'db_note.pdf', 'digital_note', 'active'),
+(2, 2, 'Tezkor A4 chop etish (3-TTJ, 312-xona)', 'LaserJet printer. 1 varaq oq-qora = 400 so‘m. Faylingizni yuklang va tayyor holda oling.', 400.00, NULL, 'print_service', 'active'),
+(3, 2, 'Algoritmlar va ma''lumotlar tuzilmasi (C++)', 'Holati yangidek. 1-kurs talabalari uchun asosiy darslik. Universitet hududida qo‘lma-qo‘l topshiriladi.', 35000.00, NULL, 'book_escrow', 'active')
 ON DUPLICATE KEY UPDATE id=id;
