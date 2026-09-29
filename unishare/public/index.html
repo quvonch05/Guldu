@@ -73,7 +73,7 @@
             <div class="max-w-2xl relative z-10">
                 <span class="px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-xs font-semibold uppercase tracking-wider mb-3 inline-block">Talabalar Ekotizimi</span>
                 <h1 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight mb-3">Talabalar uchun qulay, tezkor va xavfsiz birja</h1>
-                <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">Kitoblar, elektron konspektlar, texnikalar va talabalar xizmatlari. Komissiya avtomatlashtirilgan xavfsiz to‘lovlar.</p>
+                <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">Kitoblar, elektron konspektlar, texnikalar va talabalar xizmatlari. To‘g‘ridan-to‘g‘ri qurilmadan fayl yuklash va xavfsiz xarid.</p>
             </div>
             <div class="absolute right-4 -bottom-6 opacity-20 lg:opacity-30 motion-float pointer-events-none">
                 <i class="fa-solid fa-cube text-8xl sm:text-9xl text-indigo-400"></i>
@@ -98,7 +98,7 @@
                 </div>
             </div>
 
-            <!-- E'lonlar gridi -->
+            <!-- E'lonlar gridi (Ko'p e'lon bo'lsa ham qat'iy moslashuvchan) -->
             <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 min-h-[300px]"></div>
         </div>
 
@@ -350,11 +350,11 @@
         </div>
     </div>
 
-    <!-- Modal: E'lon berish -->
+    <!-- Modal: E'lon berish (Qurilmadan fayl yuklash imkoniyati bilan) -->
     <div id="post-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center hidden p-4">
-        <div class="glass-dark w-full max-w-lg p-6 sm:p-8 rounded-3xl border border-indigo-500/30 shadow-2xl relative">
+        <div class="glass-dark w-full max-w-lg p-6 sm:p-8 rounded-3xl border border-indigo-500/30 shadow-2xl relative max-h-[90vh] overflow-y-auto custom-scroll">
             <button onclick="closeModal('post-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            <h3 class="text-xl sm:text-2xl font-bold mb-5 text-center text-indigo-300">Yangi E'lon Joylashtirish</h3>
+            <h3 class="text-xl sm:text-2xl font-bold mb-4 text-center text-indigo-300">Yangi E'lon Joylashtirish</h3>
             <div class="space-y-3.5">
                 <div>
                     <label class="text-xs text-slate-400">Sarlavha</label>
@@ -376,24 +376,33 @@
                         </select>
                     </div>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="text-xs text-slate-400">Muqova rasmi (URL)</label>
-                        <input id="post_image" type="text" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm focus:border-indigo-500 focus:outline-none" placeholder="https://... rasm havolasi">
-                    </div>
-                    <div>
-                        <label class="text-xs text-indigo-300 font-semibold flex items-center gap-1">
-                            <i class="fa-solid fa-file-arrow-up"></i> Sotilayotgan fayl (PDF/Link)
-                        </label>
-                        <input id="post_file" type="text" class="w-full mt-1 bg-slate-900 border border-indigo-500/50 rounded-xl px-3 py-2 text-xs sm:text-sm focus:border-indigo-500 focus:outline-none" placeholder="Google Drive yoki PDF linki">
-                    </div>
+
+                <!-- 1. Qurilmadan sotiladigan faylni yuklash -->
+                <div class="p-3.5 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 space-y-2">
+                    <label class="text-xs text-indigo-300 font-bold flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-arrow-up"></i> Sotilayotgan Kitob yoki Fayl (Qurilmadan)
+                    </label>
+                    <input id="post_device_file" type="file" class="w-full text-xs text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer">
+                    <div class="text-[10px] text-slate-400">Yoki havola (Google Drive/Telegram link):</div>
+                    <input id="post_file_url" type="text" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs focus:border-indigo-500 focus:outline-none" placeholder="https://drive.google.com/...">
                 </div>
+
+                <!-- 2. Muqova rasmi -->
+                <div class="p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
+                    <label class="text-xs text-slate-400 font-medium flex items-center gap-1.5">
+                        <i class="fa-regular fa-image"></i> Muqova rasmi (Qurilmadan yoki URL)
+                    </label>
+                    <input id="post_device_image" type="file" accept="image/*" class="w-full text-xs text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-slate-300 hover:file:bg-slate-700 cursor-pointer">
+                    <input id="post_image_url" type="text" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs focus:border-indigo-500 focus:outline-none" placeholder="Yoki rasm havolasi (URL)">
+                </div>
+
                 <div>
                     <label class="text-xs text-slate-400">Tavsif</label>
                     <textarea id="post_description" rows="3" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none" placeholder="Mahsulot yoki fayl haqida qisqacha ma'lumot..."></textarea>
                 </div>
-                <button onclick="submitProduct()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 font-bold text-sm shadow-lg hover:shadow-indigo-500/40 hover:scale-[1.01] transition">
-                    Joylashtirish
+
+                <button id="post-submit-btn" onclick="submitProduct()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 font-bold text-sm shadow-lg hover:shadow-indigo-500/40 hover:scale-[1.01] transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Joylashtirish
                 </button>
             </div>
         </div>
@@ -541,28 +550,67 @@
 
         async function submitProduct() {
             if (!currentUser) return alert('Avval tizimga kiring!');
-            const payload = {
-                seller_id: currentUser.id,
-                title: document.getElementById('post_title').value.trim(),
-                price: parseFloat(document.getElementById('post_price').value),
-                category: document.getElementById('post_category').value,
-                image_url: document.getElementById('post_image').value.trim(),
-                file_url: document.getElementById('post_file').value.trim(),
-                description: document.getElementById('post_description').value.trim()
-            };
+            
+            const title = document.getElementById('post_title').value.trim();
+            const price = parseFloat(document.getElementById('post_price').value);
+            const category = document.getElementById('post_category').value;
+            const description = document.getElementById('post_description').value.trim();
 
-            const res = await fetch('/api/add_product.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            const data = await res.json();
-            if (data.status === 'success') {
-                alert(data.message);
-                closeModal('post-modal');
-                loadProducts();
-            } else {
-                alert(data.message || 'Xatolik!');
+            const deviceFile = document.getElementById('post_device_file').files[0];
+            const fileUrl = document.getElementById('post_file_url').value.trim();
+
+            const deviceImg = document.getElementById('post_device_image').files[0];
+            const imgUrl = document.getElementById('post_image_url').value.trim();
+
+            if (!title || !price || price <= 0) {
+                return alert('Sarlavha va narxni to‘g‘ri kiriting!');
+            }
+
+            const formData = new FormData();
+            formData.append('seller_id', currentUser.id);
+            formData.append('title', title);
+            formData.append('price', price);
+            formData.append('category', category);
+            formData.append('description', description);
+            formData.append('file_url', fileUrl);
+            formData.append('image_url', imgUrl);
+
+            if (deviceFile) {
+                formData.append('product_file', deviceFile);
+            }
+            if (deviceImg) {
+                formData.append('image_file', deviceImg);
+            }
+
+            const submitBtn = document.getElementById('post-submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Yuklanmoqda...';
+
+            try {
+                const res = await fetch('/api/add_product.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    alert(data.message);
+                    closeModal('post-modal');
+                    document.getElementById('post_title').value = '';
+                    document.getElementById('post_price').value = '';
+                    document.getElementById('post_description').value = '';
+                    document.getElementById('post_device_file').value = '';
+                    document.getElementById('post_file_url').value = '';
+                    document.getElementById('post_device_image').value = '';
+                    document.getElementById('post_image_url').value = '';
+                    loadProducts();
+                } else {
+                    alert(data.message || 'Xatolik!');
+                }
+            } catch (e) {
+                alert('Faylni yuklashda xatolik yuz berdi!');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Joylashtirish';
             }
         }
 
@@ -628,7 +676,7 @@
                         </div>
                         <div class="flex sm:flex-col items-end justify-between w-full sm:w-auto gap-2">
                             <span class="text-emerald-400 font-bold text-sm">${parseFloat(o.paid_amount).toLocaleString()} UZS</span>
-                            <a href="${downloadTarget}" target="_blank" rel="noopener noreferrer" class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-lg transition">
+                            <a href="${downloadTarget}" target="_blank" rel="noopener noreferrer" download class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-lg transition">
                                 <i class="fa-solid fa-cloud-arrow-down"></i> Faylni yuklab olish
                             </a>
                         </div>
