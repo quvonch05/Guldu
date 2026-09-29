@@ -26,12 +26,21 @@ try {
         exit;
     }
 
-    $uploadDir = __DIR__ . '/../public/uploads/';
-    if (!is_dir($uploadDir)) {
-        @mkdir($uploadDir, 0777, true);
+    // Papka yo'lini aniq aniqlash va ruxsat berish
+    $uploadDir = realpath(__DIR__ . '/../public');
+    if ($uploadDir) {
+        $uploadDir = $uploadDir . '/uploads/';
+    } else {
+        $uploadDir = __DIR__ . '/../public/uploads/';
     }
 
-    // 1. Qurilmadan yuklangan rasm
+    // Papkani majburiy 0777 ruxsati bilan yaratish
+    if (!file_exists($uploadDir)) {
+        @mkdir($uploadDir, 0777, true);
+    }
+    @chmod($uploadDir, 0777);
+
+    // 1. Muqova rasmi
     if (isset($_FILES['image_file']) && $_FILES['image_file']['error'] === UPLOAD_ERR_OK) {
         $imgFile = $_FILES['image_file'];
         $imgExt = strtolower(pathinfo($imgFile['name'], PATHINFO_EXTENSION));
@@ -39,7 +48,8 @@ try {
 
         if (in_array($imgExt, $allowedImg)) {
             $newImgName = 'img_' . time() . '_' . mt_rand(1000, 9999) . '.' . $imgExt;
-            if (@move_uploaded_file($imgFile['tmp_name'], $uploadDir . $newImgName)) {
+            $targetImg = $uploadDir . $newImgName;
+            if (@move_uploaded_file($imgFile['tmp_name'], $targetImg) || @copy($imgFile['tmp_name'], $targetImg)) {
                 $image_url = '/uploads/' . $newImgName;
             }
         }
@@ -49,26 +59,35 @@ try {
         $image_url = 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500&q=80';
     }
 
-    // 2. Qurilmadan yuklangan kitob/konspekt fayli
+    // 2. Kitob yoki konspekt fayli
     if (isset($_FILES['product_file']) && $_FILES['product_file']['error'] === UPLOAD_ERR_OK) {
         $docFile = $_FILES['product_file'];
         $docExt = strtolower(pathinfo($docFile['name'], PATHINFO_EXTENSION));
         $allowedDocs = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'txt', 'zip', 'rar', 'jpg', 'png'];
 
         if (!in_array($docExt, $allowedDocs)) {
-            echo json_encode(['status' => 'error', 'message' => 'Ruxsat berilmagan fayl turi! (PDF, Word, Zip formatlar qabul qilinadi)']);
+            echo json_encode(['status' => 'error', 'message' => 'Ruxsat etilmagan fayl turi! PDF, Word yoki Zip formatda yuklang.']);
             exit;
         }
 
         $newDocName = 'file_' . time() . '_' . mt_rand(1000, 9999) . '.' . $docExt;
-        if (@move_uploaded_file($docFile['tmp_name'], $uploadDir . $newDocName)) {
+        $targetDoc = $uploadDir . $newDocName;
+
+        // move_uploaded_file yoki copy orqali kafolatli saqlash
+        $saved = @move_uploaded_file($docFile['tmp_name'], $targetDoc);
+        if (!$saved) {
+            $saved = @copy($docFile['tmp_name'], $targetDoc);
+        }
+
+        if ($saved) {
             $file_url = '/uploads/' . $newDocName;
         } else {
-            echo json_encode(['status' => 'error', 'message' => 'Faylni serverga saqlashda xatolik yuz berdi. Fayl hajmini tekshiring.']);
+            // Agar server fayl tizimi cheklangan bo'lsa
+            echo json_encode(['status' => 'error', 'message' => 'Serverga saqlashda xato: Papka ruxsati yetishmadi. Fayl havolasini (link) kiritib sinab ko‘ring.']);
             exit;
         }
     } elseif (isset($_FILES['product_file']) && $_FILES['product_file']['error'] === UPLOAD_ERR_INI_SIZE) {
-        echo json_encode(['status' => 'error', 'message' => 'Fayl hajmi juda katta! Server cheklovidan oshib ketdi.']);
+        echo json_encode(['status' => 'error', 'message' => 'Fayl hajmi juda katta!']);
         exit;
     }
 
