@@ -6,7 +6,8 @@ error_reporting(E_ALL);
 header('Content-Type: application/json; charset=utf-8');
 
 // Bazani ulash
-$dbPath1 = __DIR__ . '/../../config/db.php';$dbPath2 = __DIR__ . '/../config/db.php';
+$dbPath1 = __DIR__ . '/../../config/db.php';
+$dbPath2 = __DIR__ . '/../config/db.php';
 
 if (file_exists($dbPath1)) {
     require_once $dbPath1;
@@ -17,22 +18,23 @@ if (file_exists($dbPath1)) {
 $rawInput = file_get_contents('php://input');
 $update = json_decode($rawInput, true);
 
-// Callback bo'lmagan so'rovlarga tezkor 200 OK qaytarish
-if (!$update \vert{}\vert{} !isset($update['callback_query'])) {
+// Har qanday so'rovda Telegramga darhol 200 OK qaytarish
+if (!$update || !isset($update['callback_query'])) {
     http_response_code(200);
     echo json_encode(['ok' => true]);
     exit;
 }
 
-$callback   =$update['callback_query'];
-$callbackId =$callback['id'];
-$data       =$callback['data'] ?? '';
-$messageId  =$callback['message']['message_id'] ?? 0;
-$chatId     =$callback['message']['chat']['id'] ?? 0;
+$callback   = $update['callback_query'];
+$callbackId = $callback['id'];
+$data       = $callback['data'] ?? '';
+$messageId  = $callback['message']['message_id'] ?? 0;
+$chatId     = $callback['message']['chat']['id'] ?? 0;
 
 $botToken = '7463167789:AAGMcC9QihyYDfPiGqGnHWKJ4G5rXLiSpTw';
 
-function tgPost($method,$payload, $token) {$url = "https://api.telegram.org/bot" . $token . "/" . $method;
+function tgPost($method, $payload, $token) {
+    $url = "https://api.telegram.org/bot" . $token . "/" . $method;
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($payload));
@@ -46,11 +48,11 @@ function tgPost($method,$payload, $token) {$url = "https://api.telegram.org/bot"
 
 // 1. TASDIQLASH (APPROVE)
 if (strpos($data, 'approve_') === 0) {
-    $reqId = (int)str_replace('approve_', '',$data);
+    $reqId = (int)str_replace('approve_', '', $data);
 
-    $stmt =$pdo->prepare("SELECT * FROM topup_requests WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT * FROM topup_requests WHERE id = ?");
     $stmt->execute([$reqId]);
-    $req =$stmt->fetch(PDO::FETCH_ASSOC);
+    $req = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$req) {
         tgPost('answerCallbackQuery', [
@@ -73,18 +75,18 @@ if (strpos($data, 'approve_') === 0) {
     try {
         $pdo->beginTransaction();
 
-        // 1. Talaba balansini oshirish
+        // Talaba balansini oshirish
         $pdo->prepare("UPDATE users SET balance = balance + ? WHERE id = ?")
-            ->execute([$req['amount'],$req['user_id']]);
+            ->execute([$req['amount'], $req['user_id']]);
 
-        // 2. So'rov holatini approved qilish
+        // So'rov holatini approved qilish
         $pdo->prepare("UPDATE topup_requests SET status = 'approved' WHERE id = ?")
             ->execute([$reqId]);
 
-        // 3. Billing tranzaksiyaga yozish (har qanday MySQL ustuniga mos 'click' qiymati bilan)
-        $tx = 'TG_' .$reqId . '_' . time();
+        // Billing tranzaksiyaga yozish
+        $tx = 'TG_' . $reqId . '_' . time();
         $pdo->prepare("INSERT INTO billing_transactions (user_id, `system`, transaction_id, amount, status) VALUES (?, 'click', ?, ?, 'completed')")
-            ->execute([$req['user_id'], $tx,$req['amount']]);
+            ->execute([$req['user_id'], $tx, $req['amount']]);
 
         $pdo->commit();
 
@@ -108,7 +110,8 @@ if (strpos($data, 'approve_') === 0) {
         ], $botToken);
 
     } catch (Exception $e) {
-        if ($pdo->inTransaction()) {$pdo->rollBack();
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
         }
         tgPost('answerCallbackQuery', [
             'callback_query_id' => $callbackId,
@@ -121,7 +124,7 @@ if (strpos($data, 'approve_') === 0) {
 
 // 2. RAD ETISH (REJECT)
 if (strpos($data, 'reject_') === 0) {
-    $reqId = (int)str_replace('reject_', '',$data);
+    $reqId = (int)str_replace('reject_', '', $data);
 
     $pdo->prepare("UPDATE topup_requests SET status = 'rejected' WHERE id = ?")->execute([$reqId]);
 
