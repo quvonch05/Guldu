@@ -1,656 +1,515 @@
 <!DOCTYPE html>
-<html lang="uz" class="h-full">
+<html lang="uz">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UniShare — Talabalar Bozor & To‘lov Platformasi</title>
+    <title>UniShare — Talabalar Birjasi & Savdo Maydoni</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
-                    colors: {
-                        brand: { 50: '#eef2ff', 100: '#e0e7ff', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca' }
-                    }
-                }
-            }
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
         }
-    </script>
+        .motion-float { animation: float 4s ease-in-out infinite; }
+        .glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .glass-dark {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
 </head>
-<body class="bg-[#F8FAFC] text-slate-800 font-sans min-h-screen flex flex-col justify-between antialiased">
+<body class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 min-h-screen text-slate-100 font-sans selection:bg-indigo-500 selection:text-white">
 
-    <!-- Toast Xabarnomalar -->
-    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
-
-    <div>
-        <!-- Navbar -->
-        <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
-            <div class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
-                
-                <div class="flex items-center gap-3 cursor-pointer" onclick="switchView('market')">
-                    <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center text-white shadow-md font-bold text-xl">
-                        U
-                    </div>
-                    <div>
-                        <span class="text-xl font-extrabold tracking-tight text-slate-900">Uni<span class="text-brand-600">Share</span></span>
-                        <span class="hidden sm:inline-block ml-2 px-2 py-0.5 text-[11px] font-semibold bg-emerald-50 text-emerald-600 rounded-full border border-emerald-200">Talaba Portali</span>
-                    </div>
+    <!-- Navbar -->
+    <nav class="sticky top-0 z-40 glass-dark border-b border-indigo-500/20 px-6 py-4 shadow-xl">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="switchView('catalog')">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                    <i class="fa-solid fa-graduation-cap text-xl text-white"></i>
                 </div>
+                <span class="text-2xl font-black tracking-tight bg-gradient-to-r from-white via-indigo-200 to-purple-300 bg-clip-text text-transparent">UniShare</span>
+            </div>
 
-                <!-- Right Navigation -->
-                <div class="flex items-center gap-3 sm:gap-4">
-                    <!-- Faqat kirmaganlar uchun -->
-                    <div id="guest-nav" class="flex items-center gap-2">
-                        <button onclick="openAuthModal('login')" class="text-xs sm:text-sm font-semibold px-4 py-2.5 text-slate-600 hover:text-slate-900 transition">Kirish</button>
-                        <button onclick="openAuthModal('register')" class="bg-brand-600 hover:bg-brand-700 text-white text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-xl shadow-sm transition">Ro‘yxatdan o‘tish</button>
+            <div class="flex items-center gap-4">
+                <button id="post-btn" onclick="openModal('post-modal')" class="hidden px-4 py-2 rounded-xl bg-indigo-600/30 border border-indigo-500/40 hover:bg-indigo-600 transition-all duration-300 hover:scale-105 active:scale-95 text-sm font-semibold flex items-center gap-2">
+                    <i class="fa-solid fa-plus text-indigo-400"></i> E'lon berish
+                </button>
+                <button id="admin-nav-btn" onclick="openAdminPanel()" class="hidden px-4 py-2 rounded-xl bg-amber-500/20 border border-amber-500/40 hover:bg-amber-500/40 text-amber-300 transition-all duration-300 hover:scale-105 text-sm font-semibold flex items-center gap-2">
+                    <i class="fa-solid fa-shield-halved"></i> Admin Boshqaruv
+                </button>
+                <div id="auth-actions">
+                    <button onclick="openModal('auth-modal')" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold text-sm hover:shadow-lg hover:shadow-indigo-500/40 transition-all duration-300 hover:scale-105">
+                        Kirish
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-6 py-10">
+        <!-- Hero Section -->
+        <div id="hero-banner" class="relative rounded-3xl overflow-hidden p-8 sm:p-12 mb-12 border border-indigo-500/20 bg-gradient-to-r from-indigo-900/40 via-purple-900/20 to-slate-900/60 shadow-2xl">
+            <div class="max-w-2xl relative z-10">
+                <span class="px-3.5 py-1.5 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-xs font-semibold uppercase tracking-wider mb-4 inline-block">Talabalar Ekotizimi</span>
+                <h1 class="text-4xl sm:text-5xl font-black tracking-tight leading-tight mb-4">Talabalar uchun qulay, tezkor va xavfsiz birja</h1>
+                <p class="text-slate-300 text-base mb-6 leading-relaxed">Kitoblar, konspektlar, texnikalar va xizmatlar almashinuvi. Hamyonbop narxlar va tasdiqlangan talabalar tarmog‘i.</p>
+            </div>
+            <div class="absolute right-6 -bottom-6 opacity-20 lg:opacity-40 motion-float pointer-events-none">
+                <i class="fa-solid fa-cube text-9xl text-indigo-400"></i>
+            </div>
+        </div>
+
+        <!-- Catalog Container -->
+        <div id="catalog-section">
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="text-2xl font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-fire text-amber-400"></i> Yangi e'lonlar
+                </h2>
+                <button onclick="loadProducts()" class="text-xs text-indigo-300 hover:text-white transition flex items-center gap-1">
+                    <i class="fa-solid fa-rotate-right"></i> Yangilash
+                </button>
+            </div>
+            <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <!-- Mahsulotlar kartalari JS orqali joylanadi -->
+            </div>
+        </div>
+
+        <!-- Admin Control Section -->
+        <div id="admin-section" class="hidden space-y-10">
+            <div class="flex items-center justify-between border-b border-slate-700 pb-4">
+                <div>
+                    <h2 class="text-3xl font-black text-amber-400 flex items-center gap-3">
+                        <i class="fa-solid fa-gauge-high"></i> Tizim Boshqaruv Markazi
+                    </h2>
+                    <p class="text-slate-400 text-sm">Foydalanuvchilar, to‘lov tizimlari va ma'lumotlar ustidan to‘liq nazorat</p>
+                </div>
+                <button onclick="switchView('catalog')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm font-semibold transition">
+                    Katalogga qaytish
+                </button>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="glass-dark p-6 rounded-2xl border border-indigo-500/20 flex items-center justify-between">
+                    <div>
+                        <div class="text-slate-400 text-xs font-medium">Jami Talabalar</div>
+                        <div id="stat-users" class="text-3xl font-bold mt-1">0</div>
                     </div>
+                    <i class="fa-solid fa-users text-indigo-400 text-3xl"></i>
+                </div>
+                <div class="glass-dark p-6 rounded-2xl border border-indigo-500/20 flex items-center justify-between">
+                    <div>
+                        <div class="text-slate-400 text-xs font-medium">Faol E'lonlar</div>
+                        <div id="stat-products" class="text-3xl font-bold mt-1">0</div>
+                    </div>
+                    <i class="fa-solid fa-box text-purple-400 text-3xl"></i>
+                </div>
+                <div class="glass-dark p-6 rounded-2xl border border-indigo-500/20 flex items-center justify-between">
+                    <div>
+                        <div class="text-slate-400 text-xs font-medium">Moliya Aylanmasi</div>
+                        <div id="stat-volume" class="text-3xl font-bold mt-1">0 UZS</div>
+                    </div>
+                    <i class="fa-solid fa-wallet text-emerald-400 text-3xl"></i>
+                </div>
+            </div>
 
-                    <!-- Kirgan foydalanuvchilar uchun -->
-                    <div id="user-nav" class="hidden flex items-center gap-3">
-                        <!-- Balans -->
-                        <div class="bg-slate-50 border border-slate-200 rounded-xl px-3 sm:px-4 py-1.5 flex items-center gap-2.5">
-                            <span class="text-emerald-500 font-bold text-sm">💰</span>
+            <!-- Two Column Admin Tools -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Payment Config Module -->
+                <div class="glass-dark p-6 rounded-3xl border border-slate-700/60 shadow-xl space-y-4">
+                    <h3 class="text-xl font-bold text-slate-200 flex items-center gap-2">
+                        <i class="fa-solid fa-credit-card text-emerald-400"></i> To‘lov Tizimlari Sozlamalari (Click & Payme)
+                    </h3>
+                    <p class="text-xs text-slate-400">Talabalar hisobini to‘ldirish uchun billing kalitlarini boshqaring</p>
+                    <div class="space-y-3 pt-2">
+                        <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <div class="text-[10px] uppercase font-bold text-slate-400">Balans</div>
-                                <div id="balance-display" class="text-xs sm:text-sm font-bold text-slate-900">0 so‘m</div>
+                                <label class="text-xs text-slate-400">Click Service ID</label>
+                                <input id="click_service_id" type="text" class="w-full mt-1 bg-slate-800/80 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none" placeholder="12345">
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400">Click Merchant ID</label>
+                                <input id="click_merchant_id" type="text" class="w-full mt-1 bg-slate-800/80 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none" placeholder="6789">
                             </div>
                         </div>
-
-                        <!-- Balans to'ldirish -->
-                        <button onclick="toggleModal('topup-modal', true)" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition">
-                            + To‘ldirish
-                        </button>
-
-                        <!-- Profil tugmasi -->
-                        <button onclick="switchView('profile')" class="border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-semibold px-3 py-2 rounded-xl transition">
-                            Mening profilim
-                        </button>
-
-                        <!-- Admin Panel tugmasi (faqat adminlarga) -->
-                        <button id="admin-panel-btn" onclick="switchView('admin')" class="hidden bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold px-3 py-2 rounded-xl transition">
-                            Admin Panel
-                        </button>
-
-                        <!-- Chiqish -->
-                        <button onclick="logout()" title="Tizimdan chiqish" class="text-slate-400 hover:text-rose-500 p-2 transition">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                        <div>
+                            <label class="text-xs text-slate-400">Click Secret Key</label>
+                            <input id="click_secret_key" type="password" class="w-full mt-1 bg-slate-800/80 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none" placeholder="••••••••">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 pt-2">
+                            <div>
+                                <label class="text-xs text-slate-400">Payme Merchant ID</label>
+                                <input id="payme_merchant_id" type="text" class="w-full mt-1 bg-slate-800/80 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none" placeholder="Payme ID">
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400">Payme Secret Key</label>
+                                <input id="payme_secret_key" type="password" class="w-full mt-1 bg-slate-800/80 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none" placeholder="••••••••">
+                            </div>
+                        </div>
+                        <button onclick="savePaymentKeys()" class="w-full mt-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 font-semibold text-sm transition-all duration-200">
+                            Kalitlarni Saqlash
                         </button>
                     </div>
                 </div>
-            </div>
-        </header>
 
-        <!-- VIEW 1: ASOSIY MARKETPLACE -->
-        <main id="market-view" class="max-w-7xl mx-auto px-4 py-10">
-            <!-- Hero Banner -->
-            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-8 sm:p-12 mb-10 shadow-xl">
-                <div class="relative z-10 max-w-2xl">
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-semibold mb-4 border border-indigo-400/20">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> GulDU Talabalar tarmog‘i
-                    </span>
-                    <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-3">Talabalararo xizmatlar va materiallar birjasi</h1>
-                    <p class="text-slate-300 text-sm sm:text-base leading-relaxed">Sifatli konspektlar, kitoblar xaridi va TTJ da tezkor chop etish xizmatidan onlayn foydalaning.</p>
-                </div>
-            </div>
-
-            <!-- Filtrlar va Qidiruv -->
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-                <div class="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0" id="category-tabs">
-                    <button onclick="filterCategory('all')" data-cat="all" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-brand-600 text-white shadow-sm">Barchasi</button>
-                    <button onclick="filterCategory('digital_note')" data-cat="digital_note" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-white border border-slate-200 text-slate-600 hover:bg-slate-50">Konspektlar</button>
-                    <button onclick="filterCategory('print_service')" data-cat="print_service" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-white border border-slate-200 text-slate-600 hover:bg-slate-50">Dorm-Print</button>
-                    <button onclick="filterCategory('book_escrow')" data-cat="book_escrow" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-white border border-slate-200 text-slate-600 hover:bg-slate-50">Kitoblar</button>
-                </div>
-
-                <div class="relative w-full md:w-80">
-                    <input type="text" id="search-input" onkeyup="renderProducts()" placeholder="Qidirish..." class="w-full bg-white border border-slate-200 rounded-xl pl-4 pr-4 py-2.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500">
-                </div>
-            </div>
-
-            <!-- Mahsulotlar kartochkalari -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="products-container"></div>
-        </main>
-
-        <!-- VIEW 2: SHAXSIY PROFIL -->
-        <main id="profile-view" class="hidden max-w-5xl mx-auto px-4 py-10">
-            <div class="flex items-center justify-between mb-8">
-                <div>
-                    <h2 class="text-2xl font-bold text-slate-900">Shaxsiy Kabinet</h2>
-                    <p class="text-xs text-slate-500" id="profile-user-info"></p>
-                </div>
-                <button onclick="switchView('market')" class="text-xs font-semibold text-brand-600 hover:underline">← Asosiy sahifaga qaytish</button>
-            </div>
-
-            <!-- Profil Ichki bo'limlari -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Yangi e'lon berish -->
-                <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                    <h3 class="font-bold text-base text-slate-900 mb-4">+ Yangi e’lon berish</h3>
-                    <form onsubmit="handleCreateProduct(event)" class="space-y-4">
+                <!-- Password Reset Module -->
+                <div class="glass-dark p-6 rounded-3xl border border-slate-700/60 shadow-xl space-y-4">
+                    <h3 class="text-xl font-bold text-slate-200 flex items-center gap-2">
+                        <i class="fa-solid fa-key text-amber-400"></i> Foydalanuvchi Parolini O‘zgartirish
+                    </h3>
+                    <p class="text-xs text-slate-400">Bloklangan yoki parolini unutgan talabalar uchun yangi parol belgilang</p>
+                    <div class="space-y-3 pt-2">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Kategoriya</label>
-                            <select id="new-prod-type" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs">
-                                <option value="digital_note">PDF Konspekt / Material</option>
-                                <option value="print_service">Dorm-Print Chop etish</option>
-                                <option value="book_escrow">Kitob (Escrow savdosi)</option>
-                            </select>
+                            <label class="text-xs text-slate-400">Foydalanuvchi ID raqami</label>
+                            <input id="reset_user_id" type="number" class="w-full mt-1 bg-slate-800/80 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:border-amber-500 focus:outline-none" placeholder="Masalan: 1">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Sarlavha</label>
-                            <input type="text" id="new-prod-title" required placeholder="Masalan: Fizika oraliq konspekt" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs">
+                            <label class="text-xs text-slate-400">Yangi Parol</label>
+                            <input id="reset_password_val" type="text" class="w-full mt-1 bg-slate-800/80 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:border-amber-500 focus:outline-none" placeholder="Yangi parol">
                         </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Tavsif</label>
-                            <textarea id="new-prod-desc" rows="2" placeholder="Qisqacha ma'lumot..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs"></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Narxi (so‘m)</label>
-                            <input type="number" id="new-prod-price" required min="500" step="500" placeholder="10000" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold">
-                        </div>
-                        <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 rounded-xl text-xs transition">Joylashtirish</button>
-                    </form>
-                </div>
-
-                <!-- Mening xaridlarim & Mening e'lonlarim -->
-                <div class="md:col-span-2 space-y-6">
-                    <!-- Xarid qilinganlar -->
-                    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                        <h3 class="font-bold text-base text-slate-900 mb-4">Mening xaridlarim</h3>
-                        <div id="my-purchases-container" class="space-y-3">
-                            <div class="text-xs text-slate-400">Yuklanmoqda...</div>
-                        </div>
-                    </div>
-
-                    <!-- Joylagan e'lonlarim -->
-                    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                        <h3 class="font-bold text-base text-slate-900 mb-4">Mening e’lonlarim</h3>
-                        <div id="my-products-container" class="space-y-3">
-                            <div class="text-xs text-slate-400">Yuklanmoqda...</div>
-                        </div>
+                        <button onclick="resetUserPassword()" class="w-full mt-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 font-semibold text-sm transition-all duration-200">
+                            Parolni Yangilash
+                        </button>
                     </div>
                 </div>
             </div>
-        </main>
 
-        <!-- VIEW 3: ADMIN PANEL -->
-        <main id="admin-view" class="hidden max-w-7xl mx-auto px-4 py-10">
-            <div class="flex items-center justify-between mb-8">
-                <div>
-                    <h2 class="text-2xl font-bold text-slate-900">Administrator Paneli</h2>
-                    <p class="text-xs text-slate-500">UniShare platformasining umumiy auditi va monitoringi</p>
-                </div>
-                <button onclick="switchView('market')" class="text-xs font-semibold text-brand-600 hover:underline">← Asosiy vitrinaga qaytish</button>
-            </div>
-
-            <!-- Statistika Metrikalari -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                <div class="bg-white p-5 rounded-2xl border border-slate-200">
-                    <div class="text-[11px] font-bold text-slate-400 uppercase">Foydalanuvchilar</div>
-                    <div id="admin-stat-users" class="text-2xl font-extrabold text-slate-900 mt-1">0</div>
-                </div>
-                <div class="bg-white p-5 rounded-2xl border border-slate-200">
-                    <div class="text-[11px] font-bold text-slate-400 uppercase">Faol E’lonlar</div>
-                    <div id="admin-stat-products" class="text-2xl font-extrabold text-slate-900 mt-1">0</div>
-                </div>
-                <div class="bg-white p-5 rounded-2xl border border-slate-200">
-                    <div class="text-[11px] font-bold text-slate-400 uppercase">Jami To‘lovlar</div>
-                    <div id="admin-stat-revenue" class="text-2xl font-extrabold text-emerald-600 mt-1">0 so‘m</div>
-                </div>
-                <div class="bg-white p-5 rounded-2xl border border-slate-200">
-                    <div class="text-[11px] font-bold text-slate-400 uppercase">Platforma Foydasi</div>
-                    <div id="admin-stat-commission" class="text-2xl font-extrabold text-indigo-600 mt-1">0 so‘m</div>
+            <!-- Users & Management Table -->
+            <div class="glass-dark p-6 rounded-3xl border border-slate-700/60">
+                <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-indigo-400"></i> Ro‘yxatdagi Talabalar va Foydalanuvchilar
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-slate-300">
+                        <thead class="text-xs uppercase bg-slate-800/60 text-slate-400">
+                            <tr>
+                                <th class="p-3">ID</th>
+                                <th class="p-3">F.I.SH</th>
+                                <th class="p-3">Talaba ID</th>
+                                <th class="p-3">Telefon</th>
+                                <th class="p-3">Rol</th>
+                                <th class="p-3">Balans</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-users-table" class="divide-y divide-slate-800">
+                            <!-- JS orqali to'ldiriladi -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
+        </div>
+    </main>
 
-            <!-- Foydalanuvchilar va Tranzaksiyalar Jadvallari -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Tranzaksiyalar -->
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                    <h4 class="font-bold text-sm text-slate-900 mb-4">Oxirgi To‘lovlar (Click)</h4>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs">
-                            <thead>
-                                <tr class="text-slate-400 border-b">
-                                    <th class="pb-2">Foydalanuvchi</th>
-                                    <th class="pb-2">Summa</th>
-                                    <th class="pb-2">Status</th>
-                                    <th class="pb-2">Vaqt</th>
-                                </tr>
-                            </thead>
-                            <tbody id="admin-tx-table"></tbody>
-                        </table>
+    <!-- Modal: Auth (Kirish & Ro'yxatdan o'tish) -->
+    <div id="auth-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center hidden p-4">
+        <div class="glass-dark w-full max-w-md p-8 rounded-3xl border border-indigo-500/30 shadow-2xl relative">
+            <button onclick="closeModal('auth-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            
+            <div id="auth-form-wrapper">
+                <h3 id="modal-title" class="text-2xl font-bold mb-6 text-center">Tizimga kirish</h3>
+                <div class="space-y-4">
+                    <div id="reg-name-field" class="hidden">
+                        <label class="text-xs text-slate-400">To‘liq Ismingiz</label>
+                        <input id="input_name" type="text" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:border-indigo-500 focus:outline-none" placeholder="Ali Valiyev">
                     </div>
-                </div>
-
-                <!-- Ro'yxatdan o'tganlar -->
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                    <h4 class="font-bold text-sm text-slate-900 mb-4">Foydalanuvchilar Ro‘yxati</h4>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs">
-                            <thead>
-                                <tr class="text-slate-400 border-b">
-                                    <th class="pb-2">Ism</th>
-                                    <th class="pb-2">Talaba ID</th>
-                                    <th class="pb-2">Balans</th>
-                                    <th class="pb-2">Rol</th>
-                                </tr>
-                            </thead>
-                            <tbody id="admin-users-table"></tbody>
-                        </table>
+                    <div>
+                        <label class="text-xs text-slate-400">Talaba ID (Login)</label>
+                        <input id="input_login" type="text" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:border-indigo-500 focus:outline-none" placeholder="STU1001 yoki ADMIN01">
+                    </div>
+                    <div id="reg-phone-field" class="hidden">
+                        <label class="text-xs text-slate-400">Telefon raqam</label>
+                        <input id="input_phone" type="text" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:border-indigo-500 focus:outline-none" placeholder="+998901234567">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400">Parol</label>
+                        <input id="input_password" type="password" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:border-indigo-500 focus:outline-none" placeholder="••••••••">
+                    </div>
+                    <button id="auth-submit-btn" onclick="handleAuthSubmit()" class="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 font-bold text-sm shadow-lg hover:shadow-indigo-500/40 hover:scale-[1.02] active:scale-95 transition">
+                        Kirish
+                    </button>
+                    <div class="text-center text-xs text-slate-400 pt-2">
+                        <span id="auth-switch-text">Hisobingiz yo‘qmi?</span>
+                        <button onclick="toggleAuthMode()" id="auth-switch-btn" class="text-indigo-400 hover:underline font-semibold ml-1">Ro‘yxatdan o‘ting</button>
                     </div>
                 </div>
             </div>
-        </main>
-    </div>
-
-    <!-- MODAL: Avtorizatsiya (Login & Register) -->
-    <div id="auth-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm hidden p-4">
-        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100">
-            <div class="flex justify-between items-center mb-5">
-                <h3 id="auth-modal-title" class="text-lg font-bold text-slate-900">Tizimga kirish</h3>
-                <button onclick="toggleModal('auth-modal', false)" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
-            </div>
-
-            <!-- Login Form -->
-            <form id="login-form" onsubmit="handleAuthLogin(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Talaba ID (yoki Login)</label>
-                    <input type="text" id="login-id" required placeholder="Masalan: STU1001" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Parol</label>
-                    <input type="password" id="login-password" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs">
-                </div>
-                <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 rounded-xl text-xs transition">Kirish</button>
-                <div class="text-center text-xs text-slate-500 pt-2">
-                    Hisobingiz yo‘qmi? <a href="#" onclick="openAuthModal('register')" class="text-brand-600 font-bold hover:underline">Ro‘yxatdan o‘ting</a>
-                </div>
-            </form>
-
-            <!-- Register Form -->
-            <form id="register-form" onsubmit="handleAuthRegister(event)" class="space-y-3 hidden">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">F.I.SH (To‘liq ism)</label>
-                    <input type="text" id="reg-name" required placeholder="Quvonchbek Baratov" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Talaba ID / Hemis ID</label>
-                    <input type="text" id="reg-id" required placeholder="STU1002" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Telefon raqam</label>
-                    <input type="text" id="reg-phone" required placeholder="+998901234567" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Parol</label>
-                    <input type="password" id="reg-password" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs">
-                </div>
-                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs transition">Hisob yaratish</button>
-                <div class="text-center text-xs text-slate-500 pt-2">
-                    Akkauntingiz bormi? <a href="#" onclick="openAuthModal('login')" class="text-brand-600 font-bold hover:underline">Kirish</a>
-                </div>
-            </form>
         </div>
     </div>
 
-    <!-- MODAL: To'ldirish -->
-    <div id="topup-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm hidden p-4">
-        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-base font-bold text-slate-900">Click orqali to‘ldirish</h3>
-                <button onclick="toggleModal('topup-modal', false)" class="text-slate-400 text-lg font-bold">&times;</button>
+    <!-- Modal: E'lon joylash -->
+    <div id="post-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center hidden p-4">
+        <div class="glass-dark w-full max-w-lg p-8 rounded-3xl border border-indigo-500/30 shadow-2xl relative">
+            <button onclick="closeModal('post-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-2xl font-bold mb-6 text-center text-indigo-300">Yangi E'lon Joylashtirish</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs text-slate-400">Sarlavha</label>
+                    <input id="post_title" type="text" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none" placeholder="Masalan: Fizika kitobi 1-kurs">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs text-slate-400">Narx (UZS)</label>
+                        <input id="post_price" type="number" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none" placeholder="45000">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400">Kategoriya</label>
+                        <select id="post_category" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none">
+                            <option>Kitoblar</option>
+                            <option>Konspektlar</option>
+                            <option>Elektronika</option>
+                            <option>Kantselyariya</option>
+                            <option>Boshqa</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400">Rasm havolasi (URL)</label>
+                    <input id="post_image" type="text" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none" placeholder="https://images.unsplash.com/...">
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400">Tavsif</label>
+                    <textarea id="post_description" rows="3" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none" placeholder="Mahsulot holati haqida ma'lumot"></textarea>
+                </div>
+                <button onclick="submitProduct()" class="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 font-bold text-sm shadow-lg hover:shadow-indigo-500/40 hover:scale-[1.02] transition">
+                    Joylashtirish
+                </button>
             </div>
-            <input type="number" id="topup-amount" value="30000" min="1000" step="5000" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold mb-4">
-            <button onclick="proceedToClick()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 rounded-xl text-xs transition">Click to‘loviga o‘tish</button>
         </div>
     </div>
 
+    <!-- Application Script -->
     <script>
-        // Foydalanuvchi Sessiyasi (localStorage)
-        let currentUser = JSON.parse(localStorage.getItem('unishare_user') || 'null');
-        let allProducts = [];
-        let currentFilter = 'all';
+        let currentUser = null;
+        let isRegister = false;
 
-        // Modalni ochish/yopish
-        function toggleModal(id, show) {
-            document.getElementById(id).classList.toggle('hidden', !show);
+        document.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('unishare_user');
+            if (saved) {
+                currentUser = JSON.parse(saved);
+                renderUserUI();
+            }
+            loadProducts();
+        });
+
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        function toggleAuthMode() {
+            isRegister = !isRegister;
+            document.getElementById('modal-title').innerText = isRegister ? 'Ro‘yxatdan o‘tish' : 'Tizimga kirish';
+            document.getElementById('reg-name-field').classList.toggle('hidden', !isRegister);
+            document.getElementById('reg-phone-field').classList.toggle('hidden', !isRegister);
+            document.getElementById('auth-submit-btn').innerText = isRegister ? 'Ro‘yxatdan o‘tish' : 'Kirish';
+            document.getElementById('auth-switch-text').innerText = isRegister ? 'Hisobingiz bormi?' : 'Hisobingiz yo‘qmi?';
+            document.getElementById('auth-switch-btn').innerText = isRegister ? 'Kirish' : 'Ro‘yxatdan o‘ting';
         }
 
-        function showToast(msg, type = 'success') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = `pointer-events-auto px-4 py-3 rounded-xl shadow-xl border text-xs font-semibold flex items-center gap-2 ${
-                type === 'success' ? 'bg-white border-emerald-200 text-emerald-800' : 'bg-white border-rose-200 text-rose-800'
-            }`;
-            toast.innerHTML = `<span>${msg}</span>`;
-            container.appendChild(toast);
-            setTimeout(() => toast.remove(), 3500);
-        }
+        async function handleAuthSubmit() {
+            const payload = {
+                action: isRegister ? 'register' : 'login',
+                student_id: document.getElementById('input_login').value.trim(),
+                password: document.getElementById('input_password').value
+            };
+            if (isRegister) {
+                payload.full_name = document.getElementById('input_name').value.trim();
+                payload.phone = document.getElementById('input_phone').value.trim();
+            }
 
-        // Tizim holatini yangilash (UI Sync)
-        function syncAuthState() {
-            if (currentUser) {
-                document.getElementById('guest-nav').classList.add('hidden');
-                document.getElementById('user-nav').classList.remove('hidden');
-                document.getElementById('balance-display').innerText = Number(currentUser.balance).toLocaleString('uz-UZ') + " so‘m";
-                
-                if (currentUser.role === 'admin') {
-                    document.getElementById('admin-panel-btn').classList.remove('hidden');
+            try {
+                const res = await fetch('/api/auth.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    if (isRegister) {
+                        alert('Muvaffaqiyatli ro‘yxatdan o‘tdingiz! Endi tizimga kiring.');
+                        toggleAuthMode();
+                    } else {
+                        currentUser = data.user;
+                        localStorage.setItem('unishare_user', JSON.stringify(currentUser));
+                        closeModal('auth-modal');
+                        renderUserUI();
+                    }
                 } else {
-                    document.getElementById('admin-panel-btn').classList.add('hidden');
+                    alert(data.message || 'Xatolik yuz berdi!');
                 }
-            } else {
-                document.getElementById('guest-nav').classList.remove('hidden');
-                document.getElementById('user-nav').classList.add('hidden');
-                document.getElementById('admin-panel-btn').classList.add('hidden');
+            } catch (err) {
+                alert('Server bilan bog‘lanishda xato!');
             }
         }
 
-        // Ko'rinishlarni almashtirish (Market, Profil, Admin)
-        function switchView(viewName) {
-            document.getElementById('market-view').classList.add('hidden');
-            document.getElementById('profile-view').classList.add('hidden');
-            document.getElementById('admin-view').classList.add('hidden');
+        function renderUserUI() {
+            const authActions = document.getElementById('auth-actions');
+            const postBtn = document.getElementById('post-btn');
+            const adminNavBtn = document.getElementById('admin-nav-btn');
 
-            if (viewName === 'market') {
-                document.getElementById('market-view').classList.remove('hidden');
-            } else if (viewName === 'profile') {
-                if (!currentUser) return openAuthModal('login');
-                document.getElementById('profile-view').classList.remove('hidden');
-                loadProfileData();
-            } else if (viewName === 'admin') {
-                if (!currentUser || currentUser.role !== 'admin') return alert("Faqat admin uchun");
-                document.getElementById('admin-view').classList.remove('hidden');
-                loadAdminData();
-            }
-        }
+            if (currentUser) {
+                postBtn.classList.remove('hidden');
+                if (currentUser.role === 'admin') adminNavBtn.classList.remove('hidden');
 
-        // Autentifikatsiya modali
-        function openAuthModal(mode) {
-            toggleModal('auth-modal', true);
-            if (mode === 'login') {
-                document.getElementById('auth-modal-title').innerText = "Tizimga kirish";
-                document.getElementById('login-form').classList.remove('hidden');
-                document.getElementById('register-form').classList.add('hidden');
+                authActions.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="text-right hidden sm:block">
+                            <div class="text-xs font-bold text-white">${currentUser.full_name}</div>
+                            <div class="text-[10px] text-indigo-300 font-mono">${currentUser.student_id} (${currentUser.balance} UZS)</div>
+                        </div>
+                        <button onclick="logout()" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-rose-500/20 hover:text-rose-400 border border-slate-700 flex items-center justify-center transition">
+                            <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
+                        </button>
+                    </div>
+                `;
             } else {
-                document.getElementById('auth-modal-title').innerText = "Ro‘yxatdan o‘tish";
-                document.getElementById('login-form').classList.add('hidden');
-                document.getElementById('register-form').classList.remove('hidden');
-            }
-        }
-
-        // Login so'rovi
-        async function handleAuthLogin(e) {
-            e.preventDefault();
-            const student_id = document.getElementById('login-id').value.trim();
-            const password = document.getElementById('login-password').value;
-
-            const res = await fetch('/api/auth.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'login', student_id, password })
-            });
-            const data = await res.json();
-
-            if (data.status === 'success') {
-                currentUser = data.user;
-                localStorage.setItem('unishare_user', JSON.stringify(currentUser));
-                toggleModal('auth-modal', false);
-                syncAuthState();
-                showToast("Xush kelibsiz, " + currentUser.full_name);
-            } else {
-                showToast(data.message, 'error');
-            }
-        }
-
-        // Register so'rovi
-        async function handleAuthRegister(e) {
-            e.preventDefault();
-            const full_name = document.getElementById('reg-name').value.trim();
-            const student_id = document.getElementById('reg-id').value.trim();
-            const phone = document.getElementById('reg-phone').value.trim();
-            const password = document.getElementById('reg-password').value;
-
-            const res = await fetch('/api/auth.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'register', full_name, student_id, phone, password })
-            });
-            const data = await res.json();
-
-            if (data.status === 'success') {
-                showToast("Ro‘yxatdan o‘tildi! Endi tizimga kiring.");
-                openAuthModal('login');
-            } else {
-                showToast(data.message, 'error');
+                postBtn.classList.add('hidden');
+                adminNavBtn.classList.add('hidden');
+                authActions.innerHTML = `
+                    <button onclick="openModal('auth-modal')" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold text-sm hover:shadow-lg hover:shadow-indigo-500/40 transition">
+                        Kirish
+                    </button>
+                `;
             }
         }
 
         function logout() {
             localStorage.removeItem('unishare_user');
             currentUser = null;
-            syncAuthState();
-            switchView('market');
-            showToast("Tizimdan chiqildi");
+            renderUserUI();
+            switchView('catalog');
         }
 
-        // Mahsulotlarni olish
-        async function fetchProducts() {
+        async function submitProduct() {
+            if (!currentUser) return alert('Avval tizimga kiring!');
+            const payload = {
+                seller_id: currentUser.id,
+                title: document.getElementById('post_title').value.trim(),
+                price: parseFloat(document.getElementById('post_price').value),
+                category: document.getElementById('post_category').value,
+                image_url: document.getElementById('post_image').value.trim(),
+                description: document.getElementById('post_description').value.trim()
+            };
+
+            const res = await fetch('/api/add_product.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.status === 'success') {
+                alert(data.message);
+                closeModal('post-modal');
+                loadProducts();
+            } else {
+                alert(data.message || 'Xatolik!');
+            }
+        }
+
+        async function loadProducts() {
+            const grid = document.getElementById('products-grid');
             try {
                 const res = await fetch('/api/get_products.php');
-                const data = await res.json();
-                if (data.status === 'success') {
-                    allProducts = data.data;
-                    renderProducts();
+                const result = await res.json();
+                const products = result.data || [];
+                
+                if (products.length === 0) {
+                    grid.innerHTML = '<div class="col-span-full py-12 text-center text-slate-400">Hozircha faol e\'lonlar yo‘q. Birinchi bo‘lib e\'lon bering!</div>';
+                    return;
                 }
-            } catch(e) {
-                console.error(e);
-            }
-        }
 
-        function renderProducts() {
-            const container = document.getElementById('products-container');
-            const search = document.getElementById('search-input').value.toLowerCase();
-
-            const filtered = allProducts.filter(p => {
-                const matchCat = currentFilter === 'all' || p.type === currentFilter;
-                const matchSearch = p.title.toLowerCase().includes(search);
-                return matchCat && matchSearch;
-            });
-
-            container.innerHTML = '';
-            filtered.forEach(p => {
-                let badge = p.type === 'digital_note' ? 'PDF Konspekt' : (p.type === 'print_service' ? 'Dorm-Print' : 'Escrow Kitob');
-                container.innerHTML += `
-                    <div class="bg-white rounded-2xl border border-slate-200 p-5 flex flex-col justify-between hover:shadow-lg transition">
-                        <div>
-                            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600 mb-2 inline-block">${badge}</span>
-                            <h3 class="font-bold text-slate-800 text-sm mb-1">${p.title}</h3>
-                            <p class="text-xs text-slate-500 mb-4">${p.description || ''}</p>
+                grid.innerHTML = products.map(p => `
+                    <div class="glass-dark rounded-2xl overflow-hidden border border-slate-700/60 hover:border-indigo-500/50 transition-all duration-300 hover:-translate-y-2 group shadow-lg">
+                        <div class="h-44 overflow-hidden relative">
+                            <img src="${p.image_url || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500'}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="${p.title}">
+                            <span class="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-lg text-[10px] font-semibold text-indigo-300 uppercase">${p.category}</span>
                         </div>
-                        <div class="border-t pt-3 flex items-center justify-between">
-                            <span class="font-extrabold text-slate-900 text-sm">${Number(p.price).toLocaleString()} so‘m</span>
-                            <button onclick="buyProduct(${p.id})" class="bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg transition">
-                                Xarid qilish
-                            </button>
+                        <div class="p-4 space-y-2">
+                            <h4 class="font-bold text-base truncate text-slate-100">${p.title}</h4>
+                            <p class="text-xs text-slate-400 line-clamp-2">${p.description || 'Tavsif berilmagan'}</p>
+                            <div class="pt-2 flex items-center justify-between border-t border-slate-800">
+                                <span class="text-indigo-400 font-extrabold text-sm">${parseFloat(p.price).toLocaleString()} UZS</span>
+                                <span class="text-[11px] text-slate-400"><i class="fa-regular fa-user mr-1"></i>${p.author_name}</span>
+                            </div>
                         </div>
                     </div>
-                `;
-            });
-        }
-
-        async function buyProduct(id) {
-            if (!currentUser) return openAuthModal('login');
-            if (!confirm("Ushbu xaridni amalga oshirishni xohlaysizmi?")) return;
-
-            const res = await fetch('/api/buy_product.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ buyer_id: currentUser.id, product_id: id })
-            });
-            const data = await res.json();
-
-            if (data.status === 'success') {
-                showToast(data.message);
-                refreshUserBalance();
-                if (data.download_url) window.location.href = data.download_url;
-            } else {
-                showToast(data.message, 'error');
+                `).join('');
+            } catch (err) {
+                grid.innerHTML = '<div class="col-span-full py-8 text-center text-rose-400">E\'lonlarni yuklashda xatolik yuz berdi.</div>';
             }
         }
 
-        async function refreshUserBalance() {
-            if (!currentUser) return;
-            const res = await fetch('/api/auth.php', {
+        function switchView(view) {
+            document.getElementById('catalog-section').classList.toggle('hidden', view !== 'catalog');
+            document.getElementById('hero-banner').classList.toggle('hidden', view !== 'catalog');
+            document.getElementById('admin-section').classList.toggle('hidden', view !== 'admin');
+        }
+
+        async function openAdminPanel() {
+            if (!currentUser || currentUser.role !== 'admin') return alert('Ruxsat yo‘q!');
+            switchView('admin');
+            
+            const res = await fetch('/api/admin_actions.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'get_user', user_id: currentUser.id })
+                body: JSON.stringify({ action: 'get_stats', admin_id: currentUser.id })
             });
             const data = await res.json();
             if (data.status === 'success') {
-                currentUser = data.user;
-                localStorage.setItem('unishare_user', JSON.stringify(currentUser));
-                syncAuthState();
+                document.getElementById('stat-users').innerText = data.stats.users;
+                document.getElementById('stat-products').innerText = data.stats.products;
+                document.getElementById('stat-volume').innerText = parseFloat(data.stats.volume).toLocaleString() + ' UZS';
+
+                document.getElementById('admin-users-table').innerHTML = data.users.map(u => `
+                    <tr class="hover:bg-slate-800/40">
+                        <td class="p-3 font-mono text-xs">${u.id}</td>
+                        <td class="p-3 font-semibold">${u.full_name}</td>
+                        <td class="p-3 font-mono text-indigo-400">${u.student_id}</td>
+                        <td class="p-3">${u.phone || '—'}</td>
+                        <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${u.role === 'admin' ? 'bg-amber-500/20 text-amber-300' : 'bg-slate-700 text-slate-300'}">${u.role}</span></td>
+                        <td class="p-3 font-mono">${parseFloat(u.balance).toLocaleString()} UZS</td>
+                    </tr>
+                `).join('');
             }
         }
 
-        // Profil ma'lumotlarini yuklash
-        async function loadProfileData() {
-            document.getElementById('profile-user-info').innerText = `${currentUser.full_name} (${currentUser.student_id}) | Tel: ${currentUser.phone}`;
-
-            // Xaridlarni olish
-            const resPurchases = await fetch('/api/profile.php', {
+        async function savePaymentKeys() {
+            const payload = {
+                action: 'save_payment_config',
+                admin_id: currentUser.id,
+                click_service_id: document.getElementById('click_service_id').value,
+                click_merchant_id: document.getElementById('click_merchant_id').value,
+                click_secret_key: document.getElementById('click_secret_key').value,
+                payme_merchant_id: document.getElementById('payme_merchant_id').value,
+                payme_secret_key: document.getElementById('payme_secret_key').value
+            };
+            const res = await fetch('/api/admin_actions.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'get_purchases', user_id: currentUser.id })
-            });
-            const purData = await resPurchases.json();
-            const purContainer = document.getElementById('my-purchases-container');
-            purContainer.innerHTML = '';
-
-            if (purData.data && purData.data.length > 0) {
-                purData.data.forEach(item => {
-                    purContainer.innerHTML += `
-                        <div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs">
-                            <div>
-                                <div class="font-bold text-slate-800">${item.title}</div>
-                                <div class="text-[11px] text-slate-400">Holat: ${item.escrow_status} ${item.secret_qr_code ? ' | Kod: ' + item.secret_qr_code : ''}</div>
-                            </div>
-                            ${item.file_path ? `<a href="/api/download.php?user_id=${currentUser.id}&product_id=${item.product_id}" class="bg-indigo-50 text-brand-600 font-bold px-3 py-1.5 rounded-lg border border-brand-200">Yuklab olish</a>` : ''}
-                        </div>
-                    `;
-                });
-            } else {
-                purContainer.innerHTML = '<div class="text-xs text-slate-400">Hozircha xaridlar yo‘q</div>';
-            }
-
-            // O'z e'lonlarini olish
-            const resProd = await fetch('/api/profile.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'get_my_products', user_id: currentUser.id })
-            });
-            const myProdData = await resProd.json();
-            const prodContainer = document.getElementById('my-products-container');
-            prodContainer.innerHTML = '';
-
-            if (myProdData.data && myProdData.data.length > 0) {
-                myProdData.data.forEach(item => {
-                    prodContainer.innerHTML += `
-                        <div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs">
-                            <span class="font-semibold text-slate-800">${item.title}</span>
-                            <span class="font-bold text-slate-900">${Number(item.price).toLocaleString()} so‘m</span>
-                        </div>
-                    `;
-                });
-            } else {
-                prodContainer.innerHTML = '<div class="text-xs text-slate-400">Siz hali e’lon bermagansiz</div>';
-            }
-        }
-
-        // Yangi e'lon yaratish
-        async function handleCreateProduct(e) {
-            e.preventDefault();
-            const title = document.getElementById('new-prod-title').value;
-            const description = document.getElementById('new-prod-desc').value;
-            const price = document.getElementById('new-prod-price').value;
-            const type = document.getElementById('new-prod-type').value;
-
-            const res = await fetch('/api/profile.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'create_product', user_id: currentUser.id, title, description, price, type })
+                body: JSON.stringify(payload)
             });
             const data = await res.json();
-
-            if (data.status === 'success') {
-                showToast(data.message);
-                e.target.reset();
-                loadProfileData();
-                fetchProducts();
-            } else {
-                showToast(data.message, 'error');
-            }
+            alert(data.message || (data.status === 'success' ? 'Saqlandi' : 'Xatolik'));
         }
 
-        // Admin statistikasini yuklash
-        async function loadAdminData() {
-            const res = await fetch('/api/admin.php', {
+        async function resetUserPassword() {
+            const userId = document.getElementById('reset_user_id').value;
+            const newPass = document.getElementById('reset_password_val').value;
+            if (!userId || !newPass) return alert('Ma’lumotlarni to‘liq kiriting!');
+
+            const res = await fetch('/api/admin_actions.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ admin_id: currentUser.id, action: 'get_stats' })
+                body: JSON.stringify({ action: 'reset_password', admin_id: currentUser.id, target_user_id: userId, new_password: newPass })
             });
             const data = await res.json();
-
-            if (data.status === 'success') {
-                document.getElementById('admin-stat-users').innerText = data.stats.total_users;
-                document.getElementById('admin-stat-products').innerText = data.stats.total_products;
-                document.getElementById('admin-stat-revenue').innerText = Number(data.stats.total_revenue).toLocaleString() + " so‘m";
-                document.getElementById('admin-stat-commission').innerText = Number(data.stats.total_commission).toLocaleString() + " so‘m";
-
-                // Tranzaksiyalar
-                const txTable = document.getElementById('admin-tx-table');
-                txTable.innerHTML = '';
-                data.recent_transactions.forEach(t => {
-                    txTable.innerHTML += `
-                        <tr class="border-b border-slate-100">
-                            <td class="py-2.5">${t.full_name}</td>
-                            <td class="py-2.5 font-bold text-emerald-600">${Number(t.amount).toLocaleString()} so‘m</td>
-                            <td class="py-2.5"><span class="px-2 py-0.5 rounded text-[10px] ${t.state === 2 ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${t.state === 2 ? 'To‘langan' : 'Kutilmoqda'}</span></td>
-                            <td class="py-2.5 text-slate-400">${t.created_at.slice(0, 16)}</td>
-                        </tr>
-                    `;
-                });
-
-                // Foydalanuvchilar
-                const uTable = document.getElementById('admin-users-table');
-                uTable.innerHTML = '';
-                data.users.forEach(u => {
-                    uTable.innerHTML += `
-                        <tr class="border-b border-slate-100">
-                            <td class="py-2.5 font-medium">${u.full_name}</td>
-                            <td class="py-2.5 text-slate-500">${u.student_id}</td>
-                            <td class="py-2.5 font-bold">${Number(u.balance).toLocaleString()}</td>
-                            <td class="py-2.5"><span class="px-1.5 py-0.5 rounded text-[10px] ${u.role === 'admin' ? 'bg-purple-100 text-purple-700 font-bold' : 'bg-slate-100 text-slate-600'}">${u.role}</span></td>
-                        </tr>
-                    `;
-                });
-            }
+            alert(data.message || (data.status === 'success' ? 'Yangilandi' : 'Xatolik'));
         }
-
-        function proceedToClick() {
-            const amount = document.getElementById('topup-amount').value;
-            if (!currentUser) return openAuthModal('login');
-            const serviceId = "12345";
-            const returnUrl = encodeURIComponent(window.location.origin);
-            window.location.href = `https://my.click.uz/services/pay?service_id=${serviceId}&merchant_id=${serviceId}&amount=${amount}&transaction_param=${currentUser.id}&return_url=${returnUrl}`;
-        }
-
-        // Boshlang'ich chaqiruvlar
-        syncAuthState();
-        fetchProducts();
     </script>
 </body>
 </html>
