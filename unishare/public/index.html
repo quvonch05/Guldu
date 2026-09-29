@@ -39,7 +39,7 @@
                 <span class="text-xl sm:text-2xl font-black tracking-tight bg-gradient-to-r from-white via-indigo-200 to-purple-300 bg-clip-text text-transparent">UniShare</span>
             </div>
 
-            <!-- Foydalanuvchi va Boshqaruv tugmalari -->
+            <!-- Boshqaruv tugmalari -->
             <div class="flex items-center gap-2 sm:gap-3">
                 <button id="topup-nav-btn" onclick="openModal('topup-modal')" class="hidden px-3 py-2 rounded-xl bg-emerald-500/20 border border-emerald-500/40 hover:bg-emerald-500/30 text-emerald-300 transition-all duration-300 text-xs sm:text-sm font-semibold flex items-center gap-1.5">
                     <i class="fa-solid fa-wallet"></i> <span class="hidden md:inline">Hisob to‘ldirish</span>
@@ -66,7 +66,7 @@
         </div>
     </nav>
 
-    <!-- Asosiy qism -->
+    <!-- Asosiy maydon -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
         <!-- Banner -->
         <div id="hero-banner" class="relative rounded-3xl overflow-hidden p-6 sm:p-10 mb-8 border border-indigo-500/20 bg-gradient-to-r from-indigo-950/60 via-purple-950/30 to-slate-900 shadow-2xl">
@@ -148,75 +148,95 @@
                 </div>
             </div>
 
-            <!-- Asboblar paneli -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- 1. Admin Kartasi -->
-                <div class="glass-dark p-5 sm:p-6 rounded-3xl border border-amber-500/30 shadow-xl space-y-4">
-                    <h3 class="text-lg font-bold text-amber-300 flex items-center gap-2">
-                        <i class="fa-solid fa-credit-card"></i> Admin Kartasi & Payout
-                    </h3>
-                    <p class="text-xs text-slate-400">Oldi-sotdilardan tushgan 5% komissiyani kartaga chiqarish</p>
-                    <div class="space-y-3 pt-1">
-                        <div>
-                            <label class="text-[11px] text-slate-400">Karta raqami (Uzcard / Humo)</label>
-                            <input id="admin_card_number" type="text" maxlength="19" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:border-amber-500 focus:outline-none font-mono" placeholder="8600 •••• •••• ••••">
-                        </div>
-                        <div>
-                            <label class="text-[11px] text-slate-400">Karta egasi (F.I.SH)</label>
-                            <input id="admin_card_holder" type="text" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:border-amber-500 focus:outline-none" placeholder="QUVONCHBEK BARATOV">
-                        </div>
-                        <div class="grid grid-cols-2 gap-2 pt-2">
-                            <button onclick="saveAdminSettings()" class="py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold transition">
-                                Kartani saqlash
-                            </button>
-                            <button onclick="withdrawAdminProfit()" class="py-2 rounded-xl bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-xs font-bold text-slate-950 transition flex items-center justify-center gap-1">
-                                <i class="fa-solid fa-arrow-down"></i> Kartaga yechish
-                            </button>
+            <!-- Boshqaruv Asboblari Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- 1. Admin Kartasi & Payout -->
+                <div class="glass-dark p-5 rounded-3xl border border-amber-500/30 shadow-xl space-y-3 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-base font-bold text-amber-300 flex items-center gap-2">
+                            <i class="fa-solid fa-credit-card"></i> Admin Kartasi & Payout
+                        </h3>
+                        <p class="text-[11px] text-slate-400 mt-1">Komissiyani shaxsiy kartangizga yechib olish</p>
+                        <div class="space-y-2 mt-3">
+                            <div>
+                                <label class="text-[10px] text-slate-400">Karta raqami</label>
+                                <input id="admin_card_number" type="text" maxlength="19" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs font-mono focus:outline-none" placeholder="8600 •••• •••• ••••">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-slate-400">Karta egasi</label>
+                                <input id="admin_card_holder" type="text" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs focus:outline-none" placeholder="QUVONCHBEK BARATOV">
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- 2. To'lov shlyuzlari -->
-                <div class="glass-dark p-5 sm:p-6 rounded-3xl border border-slate-700/80 shadow-xl space-y-4">
-                    <h3 class="text-lg font-bold text-slate-200 flex items-center gap-2">
-                        <i class="fa-solid fa-sliders text-emerald-400"></i> To‘lov Shlyuz Kalitlari
-                    </h3>
-                    <p class="text-xs text-slate-400">Click va Payme rasmiy API sozlamalari</p>
-                    <div class="space-y-2.5 pt-1">
-                        <div class="grid grid-cols-2 gap-2">
-                            <input id="click_service_id" type="text" class="bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs focus:outline-none" placeholder="Click Service ID">
-                            <input id="click_merchant_id" type="text" class="bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs focus:outline-none" placeholder="Click Merchant ID">
-                        </div>
-                        <input id="click_secret_key" type="password" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs focus:outline-none" placeholder="Click Secret Key">
-                        <div class="grid grid-cols-2 gap-2 pt-1">
-                            <input id="payme_merchant_id" type="text" class="bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs focus:outline-none" placeholder="Payme Merchant ID">
-                            <input id="payme_secret_key" type="password" class="bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs focus:outline-none" placeholder="Payme Secret Key">
-                        </div>
-                        <button onclick="saveAdminSettings()" class="w-full mt-2 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 font-semibold text-xs transition">
-                            Shlyuz kalitlarini saqlash
+                    <div class="grid grid-cols-2 gap-2 pt-2">
+                        <button onclick="saveAdminSettings()" class="py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-[11px] font-semibold transition">
+                            Saqlash
+                        </button>
+                        <button onclick="withdrawAdminProfit()" class="py-2 rounded-xl bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 text-[11px] font-bold text-slate-950 transition flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-arrow-down"></i> Yechish
                         </button>
                     </div>
                 </div>
 
-                <!-- 3. Parollarni tiklash -->
-                <div class="glass-dark p-5 sm:p-6 rounded-3xl border border-slate-700/80 shadow-xl space-y-4">
-                    <h3 class="text-lg font-bold text-slate-200 flex items-center gap-2">
-                        <i class="fa-solid fa-key text-indigo-400"></i> Parolni O‘zgartirish
-                    </h3>
-                    <p class="text-xs text-slate-400">Parolini yo‘qotgan talaba hisobini yangilang</p>
-                    <div class="space-y-3 pt-1">
-                        <div>
-                            <label class="text-[11px] text-slate-400">Foydalanuvchi ID</label>
-                            <input id="reset_user_id" type="number" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs focus:outline-none" placeholder="Masalan: 2">
+                <!-- 2. Admin Parolini O'zgartirish -->
+                <div class="glass-dark p-5 rounded-3xl border border-rose-500/30 shadow-xl space-y-3 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-base font-bold text-rose-300 flex items-center gap-2">
+                            <i class="fa-solid fa-lock text-rose-400"></i> Admin Parolini Yangilash
+                        </h3>
+                        <p class="text-[11px] text-slate-400 mt-1">Admin hisobi xavfsizligini ta'minlash</p>
+                        <div class="space-y-2 mt-3">
+                            <input id="admin_current_pass" type="password" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs focus:outline-none" placeholder="Joriy parol">
+                            <input id="admin_new_pass" type="password" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs focus:outline-none" placeholder="Yangi parol (min. 6)">
+                            <input id="admin_confirm_pass" type="password" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs focus:outline-none" placeholder="Yangi parolni takrorlang">
                         </div>
-                        <div>
-                            <label class="text-[11px] text-slate-400">Yangi Parol</label>
-                            <input id="reset_password_val" type="text" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs focus:outline-none" placeholder="Yangi parol">
-                        </div>
-                        <button onclick="resetUserPassword()" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 font-semibold text-xs transition">
-                            Parolni Tiklash
-                        </button>
                     </div>
+                    <button onclick="changeAdminPassword()" class="w-full py-2 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 text-[11px] font-bold text-white transition shadow-lg">
+                        Admin Parolini Saqlash
+                    </button>
+                </div>
+
+                <!-- 3. To'lov Shlyuzlari -->
+                <div class="glass-dark p-5 rounded-3xl border border-slate-700/80 shadow-xl space-y-3 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-base font-bold text-slate-200 flex items-center gap-2">
+                            <i class="fa-solid fa-sliders text-emerald-400"></i> To‘lov Shlyuzlari
+                        </h3>
+                        <p class="text-[11px] text-slate-400 mt-1">Click & Payme integratsiya kalitlari</p>
+                        <div class="space-y-2 mt-3">
+                            <input id="click_service_id" type="text" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1 text-xs focus:outline-none" placeholder="Click Service ID">
+                            <input id="click_merchant_id" type="text" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1 text-xs focus:outline-none" placeholder="Click Merchant ID">
+                            <input id="click_secret_key" type="password" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1 text-xs focus:outline-none" placeholder="Click Secret Key">
+                            <input id="payme_merchant_id" type="text" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1 text-xs focus:outline-none" placeholder="Payme Merchant ID">
+                            <input id="payme_secret_key" type="password" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1 text-xs focus:outline-none" placeholder="Payme Secret Key">
+                        </div>
+                    </div>
+                    <button onclick="saveAdminSettings()" class="w-full py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 font-semibold text-[11px] transition">
+                        Shlyuzlarni saqlash
+                    </button>
+                </div>
+
+                <!-- 4. Foydalanuvchi Parolini Yangilash -->
+                <div class="glass-dark p-5 rounded-3xl border border-slate-700/80 shadow-xl space-y-3 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-base font-bold text-slate-200 flex items-center gap-2">
+                            <i class="fa-solid fa-key text-indigo-400"></i> Talaba Parolini Yangilash
+                        </h3>
+                        <p class="text-[11px] text-slate-400 mt-1">Parolini unutgan talabaga yangi parol berish</p>
+                        <div class="space-y-2.5 mt-3">
+                            <div>
+                                <label class="text-[10px] text-slate-400">Foydalanuvchi ID</label>
+                                <input id="reset_user_id" type="number" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs focus:outline-none" placeholder="Masalan: 2">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-slate-400">Yangi Parol</label>
+                                <input id="reset_password_val" type="text" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs focus:outline-none" placeholder="Yangi parol">
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="resetUserPassword()" class="w-full py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 font-semibold text-[11px] transition">
+                        Parolni Yangilash
+                    </button>
                 </div>
             </div>
 
@@ -330,7 +350,7 @@
         </div>
     </div>
 
-    <!-- Modal: E'lon berish (Sotilayotgan fayl bilan) -->
+    <!-- Modal: E'lon berish -->
     <div id="post-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center hidden p-4">
         <div class="glass-dark w-full max-w-lg p-6 sm:p-8 rounded-3xl border border-indigo-500/30 shadow-2xl relative">
             <button onclick="closeModal('post-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -700,6 +720,7 @@
             document.getElementById('admin-section').classList.toggle('hidden', view !== 'admin');
         }
 
+        // Admin Boshqaruv Markazi
         async function openAdminPanel() {
             if (!currentUser || currentUser.role !== 'admin') return alert('Ruxsat yo‘q!');
             switchView('admin');
@@ -721,7 +742,9 @@
                     if (data.settings.admin_card_holder) document.getElementById('admin_card_holder').value = data.settings.admin_card_holder;
                     if (data.settings.click_service_id) document.getElementById('click_service_id').value = data.settings.click_service_id;
                     if (data.settings.click_merchant_id) document.getElementById('click_merchant_id').value = data.settings.click_merchant_id;
+                    if (data.settings.click_secret_key) document.getElementById('click_secret_key').value = data.settings.click_secret_key;
                     if (data.settings.payme_merchant_id) document.getElementById('payme_merchant_id').value = data.settings.payme_merchant_id;
+                    if (data.settings.payme_secret_key) document.getElementById('payme_secret_key').value = data.settings.payme_secret_key;
                 }
 
                 document.getElementById('admin-products-table').innerHTML = data.products.map(p => `
@@ -739,6 +762,39 @@
                         </td>
                     </tr>
                 `).join('');
+            }
+        }
+
+        async function changeAdminPassword() {
+            if (!currentUser || currentUser.role !== 'admin') return alert('Ruxsat yo‘q!');
+
+            const currentPass = document.getElementById('admin_current_pass').value;
+            const newPass     = document.getElementById('admin_new_pass').value;
+            const confirmPass = document.getElementById('admin_confirm_pass').value;
+
+            if (!currentPass || !newPass) return alert('Barcha maydonlarni to‘ldiring!');
+            if (newPass.length < 6) return alert('Yangi parol kamida 6 ta belgidan iborat bo‘lishi shart!');
+            if (newPass !== confirmPass) return alert('Yangi parollar bir-biriga mos kelmadi!');
+
+            const res = await fetch('/api/admin_actions.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'change_admin_password',
+                    admin_id: currentUser.id,
+                    current_password: currentPass,
+                    new_password: newPass
+                })
+            });
+
+            const data = await res.json();
+            if (data.status === 'success') {
+                alert(data.message);
+                document.getElementById('admin_current_pass').value = '';
+                document.getElementById('admin_new_pass').value = '';
+                document.getElementById('admin_confirm_pass').value = '';
+            } else {
+                alert(data.message || 'Xatolik yuz berdi!');
             }
         }
 
