@@ -16,7 +16,7 @@ try {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
-    // 2. products jadvali (file_url va image_url katta fayllar uchun LONGTEXT qilinadi)
+    // 2. products jadvali
     $pdo->exec("CREATE TABLE IF NOT EXISTS products (
         id INT AUTO_INCREMENT PRIMARY KEY,
         seller_id INT NOT NULL,
@@ -31,7 +31,6 @@ try {
         FOREIGN KEY (seller_id) REFERENCES users(id) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
-    // Ustunlarni xavfsiz yangilash (agar avval VARCHAR bo'lgan bo'lsa)
     try {
         $pdo->exec("ALTER TABLE products MODIFY COLUMN file_url LONGTEXT NULL;");
         $pdo->exec("ALTER TABLE products MODIFY COLUMN image_url LONGTEXT NULL;");
@@ -53,7 +52,7 @@ try {
     $pdo->exec("CREATE TABLE IF NOT EXISTS billing_transactions (
         id INT AUTO_INCREMENT PRIMARY KEY,
         user_id INT NOT NULL,
-        `system` ENUM('click', 'payme') NOT NULL,
+        `system` VARCHAR(50) NOT NULL,
         transaction_id VARCHAR(100) UNIQUE NOT NULL,
         amount DECIMAL(12, 2) NOT NULL,
         status ENUM('pending', 'completed', 'cancelled') DEFAULT 'pending',
@@ -67,18 +66,40 @@ try {
         setting_value TEXT
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
-    // ADMIN01 profilini ta'minlash
+    // 6. topup_requests jadvali (Cheklar va Telegram orqali tasdiqlash)
+    $pdo->exec("CREATE TABLE IF NOT EXISTS topup_requests (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        amount DECIMAL(12, 2) NOT NULL,
+        system VARCHAR(50) DEFAULT 'click',
+        receipt_image LONGTEXT NOT NULL,
+        status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+    // Telegram Bot Token va Chat ID ni bazada sozlash
+    $botToken = '7463167789:AAGMcC9QihyYDfPiGqGnHWKJ4G5rXLiSpTw';$chatId = '1686406789';
+
+    $stmtSet =$pdo->prepare("INSERT INTO system_settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)");
+    $stmtSet->execute(['tg_bot_token',$botToken]);
+    $stmtSet->execute(['tg_admin_chat_id',$chatId]);
+
+    // Webhookni Telegram'ga avtomatik o'rnatish
+    $webhookUrl = "https://guldu.onrender.com/api/tg_webhook.php";
+    @file_get_contents("https://api.telegram.org/bot{$botToken}/setWebhook?url=" . urlencode($webhookUrl));
+
+    // Admin hisobini ta'minlash
     $checkAdmin =$pdo->prepare("SELECT id FROM users WHERE student_id = ?");
     $checkAdmin->execute(['ADMIN01']);
-    
     if (!$checkAdmin->fetch()) {$adminPass = password_hash('admin123', PASSWORD_BCRYPT);
         $insertAdmin =$pdo->prepare("INSERT INTO users (full_name, student_id, phone, password, role, balance) VALUES (?, ?, ?, ?, 'admin', 0.00)");
         $insertAdmin->execute(['Bosh Administrator', 'ADMIN01', '+998900000000',$adminPass]);
     }
 
     echo "<div style='font-family: sans-serif; text-align: center; margin-top: 50px;'>
-            <h2 style='color: #10b981;'>Ma'lumotlar bazasi to‘liq tayyorlandi!</h2>
-            <p style='color: #475569;'>LONGTEXT ustunlari faollashtirildi va ADMIN01 tekshirildi.</p>
+            <h2 style='color: #10b981;'>Baza muvaffaqiyatli tayyorlandi!</h2>
+            <p style='color: #475569;'>Telegram Bot va Webhook tizimi ulandi.</p>
           </div>";
 
 } catch (PDOException $e) {
