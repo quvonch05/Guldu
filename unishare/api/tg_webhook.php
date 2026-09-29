@@ -17,8 +17,14 @@ if (file_exists($dbPath1)) {
 $rawInput = file_get_contents('php://input');
 $update = json_decode($rawInput, true);
 
-// Har qanday so‘rovda Telegramga 200 OK qaytarish
-if (!$update \vert{}\vert{} !isset($update['callback_query'])) {
+// Har qanday boshqa so'rovda Telegramga darhol 200 OK qaytarish
+if (!$update) {
+    http_response_code(200);
+    echo json_encode(['ok' => true]);
+    exit;
+}
+
+if (!isset($update['callback_query'])) {
     http_response_code(200);
     echo json_encode(['ok' => true]);
     exit;
@@ -32,7 +38,7 @@ $chatId     =$callback['message']['chat']['id'] ?? 0;
 
 $botToken = '7463167789:AAGMcC9QihyYDfPiGqGnHWKJ4G5rXLiSpTw';
 
-// Telegramga so'rov yuborish
+// Telegramga so'rov yuborish funksiyasi
 function tgPost($method,$payload, $token) {$url = "https://api.telegram.org/bot" . $token . "/" . $method;
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_POST, true);
@@ -74,15 +80,15 @@ if (strpos($data, 'approve_') === 0) {
     try {
         $pdo->beginTransaction();
 
-        // Foydalanuvchi balansini oshirish
+        // Talaba balansini oshirish
         $pdo->prepare("UPDATE users SET balance = balance + ? WHERE id = ?")
             ->execute([$req['amount'],$req['user_id']]);
 
-        // So'rov maqomini approved qilish
+        // So'rov holatini approved qilish
         $pdo->prepare("UPDATE topup_requests SET status = 'approved' WHERE id = ?")
             ->execute([$reqId]);
 
-        // Tranzaksiyalar tarixiga yozish
+        // Tranzaksiyalar jadvaliga yozish
         $tx = 'TG_' .$reqId . '_' . time();
         $pdo->prepare("INSERT INTO billing_transactions (user_id, `system`, transaction_id, amount, status) VALUES (?, 'click_p2p', ?, ?, 'completed')")
             ->execute([$req['user_id'], $tx,$req['amount']]);
