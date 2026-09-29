@@ -18,13 +18,7 @@ $rawInput = file_get_contents('php://input');
 $update = json_decode($rawInput, true);
 
 // Har qanday boshqa so'rovda Telegramga darhol 200 OK qaytarish
-if (!$update) {
-    http_response_code(200);
-    echo json_encode(['ok' => true]);
-    exit;
-}
-
-if (!isset($update['callback_query'])) {
+if (!$update \vert{}\vert{} !isset($update['callback_query'])) {
     http_response_code(200);
     echo json_encode(['ok' => true]);
     exit;
@@ -55,6 +49,11 @@ function tgPost($method,$payload, $token) {$url = "https://api.telegram.org/bot"
 if (strpos($data, 'approve_') === 0) {
     $reqId = (int)str_replace('approve_', '',$data);
 
+    // Ustunni avtomatik VARCHAR(50) qilish (Data truncated xatosini yo'qotish)
+    try {
+        $pdo->exec("ALTER TABLE billing_transactions MODIFY COLUMN `system` VARCHAR(50) NOT NULL;");
+    } catch (Exception $e) {}
+
     $stmt =$pdo->prepare("SELECT * FROM topup_requests WHERE id = ?");
     $stmt->execute([$reqId]);
     $req =$stmt->fetch(PDO::FETCH_ASSOC);
@@ -80,18 +79,18 @@ if (strpos($data, 'approve_') === 0) {
     try {
         $pdo->beginTransaction();
 
-        // Talaba balansini oshirish
+        // 1. Talaba balansini oshirish
         $pdo->prepare("UPDATE users SET balance = balance + ? WHERE id = ?")
             ->execute([$req['amount'],$req['user_id']]);
 
-        // So'rov holatini approved qilish
+        // 2. So'rov holatini approved qilish
         $pdo->prepare("UPDATE topup_requests SET status = 'approved' WHERE id = ?")
             ->execute([$reqId]);
 
-        // Tranzaksiyalar jadvaliga yozish
+        // 3. Tranzaksiyalar jadvaliga yozish (Standart mos qiymat bilan)
         $tx = 'TG_' .$reqId . '_' . time();
-        $pdo->prepare("INSERT INTO billing_transactions (user_id, `system`, transaction_id, amount, status) VALUES (?, 'click_p2p', ?, ?, 'completed')")
-            ->execute([$req['user_id'], $tx,$req['amount']]);
+        $safeSystem = !empty($req['system']) ? substr($req['system'], 0, 40) : 'click';$pdo->prepare("INSERT INTO billing_transactions (user_id, `system`, transaction_id, amount, status) VALUES (?, ?, ?, ?, 'completed')")
+            ->execute([$req['user_id'],$safeSystem, $tx,$req['amount']]);
 
         $pdo->commit();
 
@@ -104,7 +103,7 @@ if (strpos($data, 'approve_') === 0) {
         $caption = "✅ <b>#" . $reqId . " — TASDIQLANDI!</b>\n\n"
                  . "💰 <b>Summa:</b> " . number_format($req['amount'], 0, '', ' ') . " UZS\n"
                  . "👤 <b>Talaba ID:</b> #" . $req['user_id'] . "\n"
-                 . "Holat: Mablag‘ hisobga biriktirildi.";
+                 . "Holat: Mablag‘ talaba balansiga tushirildi.";
 
         tgPost('editMessageCaption', [
             'chat_id' => $chatId,
