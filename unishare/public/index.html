@@ -87,7 +87,7 @@
                     <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
                     <input id="search-input" oninput="filterProducts()" type="text" placeholder="E'lonlarni qidirish..." class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl pl-10 pr-4 py-2.5 text-xs sm:text-sm focus:border-indigo-500 focus:outline-none transition">
                 </div>
-                
+
                 <div class="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 custom-scroll">
                     <button onclick="setCategory('Barchasi')" class="cat-filter-btn px-3 py-1.5 rounded-xl bg-indigo-600 text-white text-xs font-medium whitespace-nowrap transition">Barchasi</button>
                     <button onclick="setCategory('Kitoblar')" class="cat-filter-btn px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white text-xs font-medium whitespace-nowrap transition">Kitoblar</button>
@@ -780,43 +780,59 @@
             if (!currentUser || currentUser.role !== 'admin') return alert('Ruxsat yo‘q!');
             switchView('admin');
             
-            const res = await fetch('/api/admin_actions.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'get_stats', admin_id: currentUser.id })
-            });
-            const data = await res.json();
-            if (data.status === 'success') {
-                document.getElementById('stat-users').innerText = data.stats.users;
-                document.getElementById('stat-products').innerText = data.stats.products;
-                document.getElementById('stat-turnover').innerText = parseFloat(data.stats.turnover).toLocaleString() + ' UZS';
-                document.getElementById('stat-admin-balance').innerText = parseFloat(data.stats.admin_balance).toLocaleString() + ' UZS';
+            try {
+                const res = await fetch('/api/admin_actions.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'get_stats', admin_id: currentUser.id })
+                });
+                
+                const data = await res.json();
+                
+                if (data.status === 'success') {
+                    // Statistika kartalarini to'ldirish
+                    document.getElementById('stat-users').innerText = data.stats.users;
+                    document.getElementById('stat-products').innerText = data.stats.products;
+                    document.getElementById('stat-turnover').innerText = parseFloat(data.stats.turnover).toLocaleString() + ' UZS';
+                    document.getElementById('stat-admin-balance').innerText = parseFloat(data.stats.admin_balance).toLocaleString() + ' UZS';
 
-                if (data.settings) {
-                    if (data.settings.admin_card_number) document.getElementById('admin_card_number').value = data.settings.admin_card_number;
-                    if (data.settings.admin_card_holder) document.getElementById('admin_card_holder').value = data.settings.admin_card_holder;
-                    if (data.settings.click_service_id) document.getElementById('click_service_id').value = data.settings.click_service_id;
-                    if (data.settings.click_merchant_id) document.getElementById('click_merchant_id').value = data.settings.click_merchant_id;
-                    if (data.settings.click_secret_key) document.getElementById('click_secret_key').value = data.settings.click_secret_key;
-                    if (data.settings.payme_merchant_id) document.getElementById('payme_merchant_id').value = data.settings.payme_merchant_id;
-                    if (data.settings.payme_secret_key) document.getElementById('payme_secret_key').value = data.settings.payme_secret_key;
+                    // Sozlamalarni inputlarga joylashtirish
+                    if (data.settings) {
+                        if (data.settings.admin_card_number) document.getElementById('admin_card_number').value = data.settings.admin_card_number;
+                        if (data.settings.admin_card_holder) document.getElementById('admin_card_holder').value = data.settings.admin_card_holder;
+                        if (data.settings.click_service_id) document.getElementById('click_service_id').value = data.settings.click_service_id;
+                        if (data.settings.click_merchant_id) document.getElementById('click_merchant_id').value = data.settings.click_merchant_id;
+                        if (data.settings.click_secret_key) document.getElementById('click_secret_key').value = data.settings.click_secret_key;
+                        if (data.settings.payme_merchant_id) document.getElementById('payme_merchant_id').value = data.settings.payme_merchant_id;
+                        if (data.settings.payme_secret_key) document.getElementById('payme_secret_key').value = data.settings.payme_secret_key;
+                    }
+
+                    // E'lonlar jadvalini to'ldirish
+                    const tableBody = document.getElementById('admin-products-table');
+                    if (data.products && data.products.length > 0) {
+                        tableBody.innerHTML = data.products.map(p => `
+                            <tr class="hover:bg-slate-900/50">
+                                <td class="p-3 font-mono text-xs">${p.id}</td>
+                                <td class="p-3 font-medium text-slate-100 max-w-[180px] truncate">${p.title}</td>
+                                <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] bg-indigo-500/10 text-indigo-400 font-semibold">${p.category}</span></td>
+                                <td class="p-3 font-mono font-bold text-emerald-400">${parseFloat(p.price).toLocaleString()} UZS</td>
+                                <td class="p-3 text-slate-300 text-xs">${p.author_name}</td>
+                                <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${p.status === 'active' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'}">${p.status}</span></td>
+                                <td class="p-3 text-right">
+                                    <button onclick="adminDeleteProduct(${p.id})" class="px-2.5 py-1 rounded-lg bg-rose-600/20 text-rose-400 hover:bg-rose-600 hover:text-white transition text-xs font-semibold">
+                                        <i class="fa-solid fa-trash-can mr-1"></i> O‘chirish
+                                    </button>
+                                </td>
+                            </tr>
+                        `).join('');
+                    } else {
+                        tableBody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-400">Hozircha hech qanday e\'lon joylashtirilmagan.</td></tr>';
+                    }
+                } else {
+                    alert(data.message || 'Admin ma\'lumotlarini yuklashda xatolik!');
                 }
-
-                document.getElementById('admin-products-table').innerHTML = data.products.map(p => `
-                    <tr class="hover:bg-slate-900/50">
-                        <td class="p-3 font-mono text-xs">${p.id}</td>
-                        <td class="p-3 font-medium text-slate-100 max-w-[200px] truncate">${p.title}</td>
-                        <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] bg-indigo-500/10 text-indigo-400 font-semibold">${p.category}</span></td>
-                        <td class="p-3 font-mono font-bold text-emerald-400">${parseFloat(p.price).toLocaleString()} UZS</td>
-                        <td class="p-3">${p.author_name}</td>
-                        <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${p.status === 'active' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'}">${p.status}</span></td>
-                        <td class="p-3 text-right">
-                            <button onclick="adminDeleteProduct(${p.id})" class="px-2.5 py-1 rounded-lg bg-rose-600/20 text-rose-400 hover:bg-rose-600 hover:text-white transition text-xs font-semibold">
-                                <i class="fa-solid fa-trash-can mr-1"></i> O‘chirish
-                            </button>
-                        </td>
-                    </tr>
-                `).join('');
+            } catch (err) {
+                alert('Server bilan bog‘lanishda xato: ' + err.message);
             }
         }
 
