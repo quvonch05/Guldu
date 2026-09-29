@@ -39,9 +39,8 @@
                 <span class="text-xl sm:text-2xl font-black tracking-tight bg-gradient-to-r from-white via-indigo-200 to-purple-300 bg-clip-text text-transparent">UniShare</span>
             </div>
 
-            <!-- Boshqaruv tugmalari -->
             <div class="flex items-center gap-2 sm:gap-3">
-                <button id="topup-nav-btn" onclick="openModal('topup-modal')" class="hidden px-3 py-2 rounded-xl bg-emerald-500/20 border border-emerald-500/40 hover:bg-emerald-500/30 text-emerald-300 transition-all duration-300 text-xs sm:text-sm font-semibold flex items-center gap-1.5">
+                <button id="topup-nav-btn" onclick="openTopupModal()" class="hidden px-3 py-2 rounded-xl bg-emerald-500/20 border border-emerald-500/40 hover:bg-emerald-500/30 text-emerald-300 transition-all duration-300 text-xs sm:text-sm font-semibold flex items-center gap-1.5">
                     <i class="fa-solid fa-wallet"></i> <span class="hidden md:inline">Hisob to‘ldirish</span>
                 </button>
 
@@ -73,7 +72,7 @@
             <div class="max-w-2xl relative z-10">
                 <span class="px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-xs font-semibold uppercase tracking-wider mb-3 inline-block">Talabalar Ekotizimi</span>
                 <h1 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight mb-3">Talabalar uchun qulay, tezkor va xavfsiz birja</h1>
-                <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">Kitoblar, elektron konspektlar, texnikalar va talabalar xizmatlari. To‘g‘ridan-to‘g‘ri qurilmadan fayl yuklash va xavfsiz xarid qilish tizimi.</p>
+                <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">Kitoblar, elektron konspektlar, texnikalar va xizmatlar. To‘g‘ridan-to‘g‘ri qurilmadan yuklash va Telegram orqali tezkor to‘lov.</p>
             </div>
             <div class="absolute right-4 -bottom-6 opacity-20 lg:opacity-30 motion-float pointer-events-none">
                 <i class="fa-solid fa-cube text-8xl sm:text-9xl text-indigo-400"></i>
@@ -108,7 +107,7 @@
                     <h2 class="text-2xl sm:text-3xl font-black text-amber-400 flex items-center gap-2">
                         <i class="fa-solid fa-gauge-high"></i> Tizim Boshqaruv Markazi
                     </h2>
-                    <p class="text-slate-400 text-xs sm:text-sm">E'lonlar nazorati, moliyaviy aylanma va admin kartasiga komissiya tushirish</p>
+                    <p class="text-slate-400 text-xs sm:text-sm">E'lonlar nazorati, moliyaviy aylanma va Telegram to‘lov boti</p>
                 </div>
                 <button onclick="switchView('catalog')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs sm:text-sm font-semibold transition">
                     ← Katalogga qaytish
@@ -155,10 +154,10 @@
                         <h3 class="text-base font-bold text-amber-300 flex items-center gap-2">
                             <i class="fa-solid fa-credit-card"></i> Admin Kartasi & Payout
                         </h3>
-                        <p class="text-[11px] text-slate-400 mt-1">Komissiyani shaxsiy kartangizga yechib olish</p>
+                        <p class="text-[11px] text-slate-400 mt-1">Talabalar to‘lov qilishi va komissiyani yechib olish uchun</p>
                         <div class="space-y-2 mt-3">
                             <div>
-                                <label class="text-[10px] text-slate-400">Karta raqami</label>
+                                <label class="text-[10px] text-slate-400">Karta raqami (16 xona)</label>
                                 <input id="admin_card_number" type="text" maxlength="19" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs font-mono focus:outline-none" placeholder="8600 •••• •••• ••••">
                             </div>
                             <div>
@@ -177,7 +176,30 @@
                     </div>
                 </div>
 
-                <!-- 2. Admin Parolini O'zgartirish -->
+                <!-- 2. Telegram Bot Sozlamalari -->
+                <div class="glass-dark p-5 rounded-3xl border border-sky-500/30 shadow-xl space-y-3 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-base font-bold text-sky-300 flex items-center gap-2">
+                            <i class="fa-brands fa-telegram text-sky-400"></i> Telegram To‘lov Boti
+                        </h3>
+                        <p class="text-[11px] text-slate-400 mt-1">To‘lov cheklarini 1-klikda tasdiqlash boti</p>
+                        <div class="space-y-2 mt-3">
+                            <div>
+                                <label class="text-[10px] text-slate-400">Bot Token</label>
+                                <input id="tg_bot_token" type="text" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs font-mono focus:outline-none" placeholder="7463...:AAGM...">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-slate-400">Admin Chat ID</label>
+                                <input id="tg_admin_chat_id" type="text" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs font-mono focus:outline-none" placeholder="1686406789">
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="saveAdminSettings()" class="w-full py-2 rounded-xl bg-sky-600 hover:bg-sky-500 font-semibold text-[11px] transition">
+                        Botni yangilash
+                    </button>
+                </div>
+
+                <!-- 3. Admin Parolini O'zgartirish -->
                 <div class="glass-dark p-5 rounded-3xl border border-rose-500/30 shadow-xl space-y-3 flex flex-col justify-between">
                     <div>
                         <h3 class="text-base font-bold text-rose-300 flex items-center gap-2">
@@ -192,26 +214,6 @@
                     </div>
                     <button onclick="changeAdminPassword()" class="w-full py-2 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 text-[11px] font-bold text-white transition shadow-lg">
                         Admin Parolini Saqlash
-                    </button>
-                </div>
-
-                <!-- 3. To'lov Shlyuzlari -->
-                <div class="glass-dark p-5 rounded-3xl border border-slate-700/80 shadow-xl space-y-3 flex flex-col justify-between">
-                    <div>
-                        <h3 class="text-base font-bold text-slate-200 flex items-center gap-2">
-                            <i class="fa-solid fa-sliders text-emerald-400"></i> To‘lov Shlyuzlari
-                        </h3>
-                        <p class="text-[11px] text-slate-400 mt-1">Click & Payme API kalitlari</p>
-                        <div class="space-y-2 mt-3">
-                            <input id="click_service_id" type="text" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1 text-xs focus:outline-none" placeholder="Click Service ID">
-                            <input id="click_merchant_id" type="text" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1 text-xs focus:outline-none" placeholder="Click Merchant ID">
-                            <input id="click_secret_key" type="password" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1 text-xs focus:outline-none" placeholder="Click Secret Key">
-                            <input id="payme_merchant_id" type="text" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1 text-xs focus:outline-none" placeholder="Payme Merchant ID">
-                            <input id="payme_secret_key" type="password" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1 text-xs focus:outline-none" placeholder="Payme Secret Key">
-                        </div>
-                    </div>
-                    <button onclick="saveAdminSettings()" class="w-full py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 font-semibold text-[11px] transition">
-                        Shlyuzlarni saqlash
                     </button>
                 </div>
 
@@ -276,39 +278,55 @@
         </div>
     </div>
 
-    <!-- Modal: Hisobni to'ldirish -->
+    <!-- Modal: Hisobni to'ldirish (P2P + Kvitansiya skrinshoti) -->
     <div id="topup-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center hidden p-4">
-        <div class="glass-dark w-full max-w-md p-6 sm:p-8 rounded-3xl border border-emerald-500/30 shadow-2xl relative">
+        <div class="glass-dark w-full max-w-md p-6 sm:p-8 rounded-3xl border border-emerald-500/30 shadow-2xl relative max-h-[90vh] overflow-y-auto custom-scroll">
             <button onclick="closeModal('topup-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             <h3 class="text-xl sm:text-2xl font-bold mb-1 text-center text-emerald-400 flex items-center justify-center gap-2">
                 <i class="fa-solid fa-wallet"></i> Hisobni To‘ldirish
             </h3>
-            <p class="text-xs text-slate-400 text-center mb-5">Mablag‘ zudlik bilan balansingizga biriktiriladi</p>
-            <div class="space-y-4">
-                <div>
-                    <label class="text-xs text-slate-400">To‘lov tizimini tanlang</label>
-                    <div class="grid grid-cols-2 gap-3 mt-1.5">
-                        <label class="cursor-pointer border border-slate-700 rounded-xl p-3 flex items-center gap-2 bg-slate-900 hover:border-emerald-500 transition">
-                            <input type="radio" name="topup_system" value="click" checked class="text-emerald-500">
-                            <span class="text-xs sm:text-sm font-bold text-sky-400">Click</span>
-                        </label>
-                        <label class="cursor-pointer border border-slate-700 rounded-xl p-3 flex items-center gap-2 bg-slate-900 hover:border-emerald-500 transition">
-                            <input type="radio" name="topup_system" value="payme" class="text-emerald-500">
-                            <span class="text-xs sm:text-sm font-bold text-teal-300">Payme</span>
-                        </label>
-                    </div>
+            <p class="text-xs text-slate-400 text-center mb-4">Kartaga to‘lab, chekni yuklang — balans bir zumda to‘ldiriladi</p>
+
+            <div class="space-y-3.5">
+                <!-- Admin Karta Ma'lumoti -->
+                <div class="p-3.5 rounded-2xl bg-slate-900 border border-emerald-500/30 space-y-1 text-center">
+                    <span class="text-[10px] uppercase font-bold text-slate-400">Admin Qabul Qiluvchi Kartasi</span>
+                    <div id="topup-card-display" class="font-mono font-bold text-sm sm:text-base text-emerald-300 tracking-wider">8600 •••• •••• ••••</div>
+                    <div id="topup-holder-display" class="text-xs text-slate-400">Admin Qabul Qiluvchi</div>
                 </div>
+
                 <div>
                     <label class="text-xs text-slate-400">Summa (UZS)</label>
-                    <input id="topup_amount" type="number" step="1000" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:border-emerald-500 focus:outline-none" placeholder="Masalan: 50000">
+                    <input id="topup_amount" oninput="updatePayLinks()" type="number" step="1000" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:border-emerald-500 focus:outline-none" placeholder="Masalan: 50000">
                 </div>
+
+                <!-- Tezkor tugmalar -->
                 <div class="flex gap-2">
-                    <button onclick="document.getElementById('topup_amount').value=20000" class="flex-1 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs hover:border-emerald-500 transition">+20k</button>
-                    <button onclick="document.getElementById('topup_amount').value=50000" class="flex-1 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs hover:border-emerald-500 transition">+50k</button>
-                    <button onclick="document.getElementById('topup_amount').value=100000" class="flex-1 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs hover:border-emerald-500 transition">+100k</button>
+                    <button onclick="setTopupAmount(20000)" class="flex-1 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs hover:border-emerald-500 transition">+20k</button>
+                    <button onclick="setTopupAmount(50000)" class="flex-1 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs hover:border-emerald-500 transition">+50k</button>
+                    <button onclick="setTopupAmount(100000)" class="flex-1 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs hover:border-emerald-500 transition">+100k</button>
                 </div>
-                <button onclick="handleTopupSubmit()" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 font-bold text-sm shadow-lg hover:shadow-emerald-500/40 hover:scale-[1.01] transition">
-                    To‘lash va Balansni to‘ldirish
+
+                <!-- Ilovalarda bitta bosishda to'lash -->
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                    <a id="click-deeplink" href="#" target="_blank" class="py-2 px-3 rounded-xl bg-sky-600/30 border border-sky-500/50 hover:bg-sky-600 text-sky-300 hover:text-white text-xs font-bold text-center transition flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-mobile-screen"></i> Click'da to‘lash
+                    </a>
+                    <a id="payme-deeplink" href="#" target="_blank" class="py-2 px-3 rounded-xl bg-teal-600/30 border border-teal-500/50 hover:bg-teal-600 text-teal-300 hover:text-white text-xs font-bold text-center transition flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-mobile-screen"></i> Payme'da to‘lash
+                    </a>
+                </div>
+
+                <!-- Chek skrinshotini yuklash -->
+                <div class="p-3 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 space-y-1.5">
+                    <label class="text-xs text-indigo-300 font-bold flex items-center gap-1.5">
+                        <i class="fa-solid fa-receipt"></i> To‘lov cheki skrinshotini yuklang:
+                    </label>
+                    <input id="topup_receipt_file" type="file" accept="image/*" class="w-full text-xs text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer">
+                </div>
+
+                <button id="topup-submit-btn" onclick="submitTopupRequest()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 font-bold text-sm shadow-lg hover:shadow-emerald-500/40 hover:scale-[1.01] transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-paper-plane"></i> Chekni yuborish
                 </button>
             </div>
         </div>
@@ -413,6 +431,7 @@
         let isRegister = false;
         let allProducts = [];
         let currentFilter = 'Barchasi';
+        let currentAdminCard = '8600 •••• •••• ••••';
 
         document.addEventListener('DOMContentLoaded', () => {
             const saved = localStorage.getItem('unishare_user');
@@ -421,7 +440,18 @@
                 renderUserUI();
             }
             loadProducts();
+            fetchSettings();
         });
+
+        async function fetchSettings() {
+            try {
+                const res = await fetch('/api/get_products.php');
+                // Admin kartasini olish
+                if (currentUser && currentUser.role === 'admin') {
+                    // stats yuklanganda olinadi
+                }
+            } catch(e) {}
+        }
 
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
@@ -518,32 +548,62 @@
             loadProducts();
         }
 
-        async function handleTopupSubmit() {
+        // Topup boshqaruvi
+        function openTopupModal() {
+            if (!currentUser) return alert('Avval tizimga kiring!');
+            openModal('topup-modal');
+            updatePayLinks();
+        }
+
+        function setTopupAmount(val) {
+            document.getElementById('topup_amount').value = val;
+            updatePayLinks();
+        }
+
+        function updatePayLinks() {
+            const amt = document.getElementById('topup_amount').value || 10000;
+            const card = currentAdminCard.replace(/\s+/g, '');
+            document.getElementById('click-deeplink').href = `https://my.click.uz/clickp2p/${card}?amount=${amt}`;
+            document.getElementById('payme-deeplink').href = `https://payme.uz/fallback/p2p/${card}/${amt}`;
+        }
+
+        async function submitTopupRequest() {
             if (!currentUser) return alert('Avval tizimga kiring!');
             const amount = parseFloat(document.getElementById('topup_amount').value);
-            const system = document.querySelector('input[name="topup_system"]:checked').value;
+            const receipt = document.getElementById('topup_receipt_file').files[0];
 
-            if (!amount || amount < 1000) return alert('Kamida 1,000 UZS kiriting!');
+            if (!amount || amount < 1000) return alert('Summani to‘g‘ri kiriting (kamida 1,000 UZS)!');
+            if (!receipt) return alert('Iltimos, to‘lov cheki skrinshotini yuklang!');
 
-            const res = await fetch('/api/topup_balance.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user_id: currentUser.id, amount: amount, system: system })
-            });
-            const data = await res.json();
-            
-            if (data.status === 'success') {
-                if (data.mode === 'live' && data.redirect_url) {
-                    window.location.href = data.redirect_url;
-                } else {
-                    currentUser.balance = data.new_balance;
-                    localStorage.setItem('unishare_user', JSON.stringify(currentUser));
-                    renderUserUI();
-                    closeModal('topup-modal');
+            const formData = new FormData();
+            formData.append('user_id', currentUser.id);
+            formData.append('amount', amount);
+            formData.append('system', 'click_p2p');
+            formData.append('receipt_file', receipt);
+
+            const submitBtn = document.getElementById('topup-submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Yuborilmoqda...';
+
+            try {
+                const res = await fetch('/api/submit_topup.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
                     alert(data.message);
+                    closeModal('topup-modal');
+                    document.getElementById('topup_amount').value = '';
+                    document.getElementById('topup_receipt_file').value = '';
+                } else {
+                    alert(data.message || 'Xatolik yuz berdi!');
                 }
-            } else {
-                alert(data.message || 'Xatolik!');
+            } catch(e) {
+                alert('Chekni yuborishda xato yuz berdi!');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Chekni yuborish';
             }
         }
 
@@ -629,7 +689,7 @@
 
             if (parseFloat(currentUser.balance) < parseFloat(price)) {
                 if (confirm(`Hisobingizda mablag‘ yetarli emas!\nKerak: ${parseFloat(price).toLocaleString()} UZS\nSizda: ${parseFloat(currentUser.balance).toLocaleString()} UZS\n\nHisobingizni hozir to‘ldirasizmi?`)) {
-                    openModal('topup-modal');
+                    openTopupModal();
                 }
                 return;
             }
@@ -790,24 +850,25 @@
                 const data = await res.json();
                 
                 if (data.status === 'success') {
-                    // Statistika kartalarini to'ldirish
                     document.getElementById('stat-users').innerText = data.stats.users;
                     document.getElementById('stat-products').innerText = data.stats.products;
                     document.getElementById('stat-turnover').innerText = parseFloat(data.stats.turnover).toLocaleString() + ' UZS';
                     document.getElementById('stat-admin-balance').innerText = parseFloat(data.stats.admin_balance).toLocaleString() + ' UZS';
 
-                    // Sozlamalarni inputlarga joylashtirish
                     if (data.settings) {
-                        if (data.settings.admin_card_number) document.getElementById('admin_card_number').value = data.settings.admin_card_number;
-                        if (data.settings.admin_card_holder) document.getElementById('admin_card_holder').value = data.settings.admin_card_holder;
-                        if (data.settings.click_service_id) document.getElementById('click_service_id').value = data.settings.click_service_id;
-                        if (data.settings.click_merchant_id) document.getElementById('click_merchant_id').value = data.settings.click_merchant_id;
-                        if (data.settings.click_secret_key) document.getElementById('click_secret_key').value = data.settings.click_secret_key;
-                        if (data.settings.payme_merchant_id) document.getElementById('payme_merchant_id').value = data.settings.payme_merchant_id;
-                        if (data.settings.payme_secret_key) document.getElementById('payme_secret_key').value = data.settings.payme_secret_key;
+                        if (data.settings.admin_card_number) {
+                            document.getElementById('admin_card_number').value = data.settings.admin_card_number;
+                            currentAdminCard = data.settings.admin_card_number;
+                            document.getElementById('topup-card-display').innerText = currentAdminCard;
+                        }
+                        if (data.settings.admin_card_holder) {
+                            document.getElementById('admin_card_holder').value = data.settings.admin_card_holder;
+                            document.getElementById('topup-holder-display').innerText = data.settings.admin_card_holder;
+                        }
+                        if (data.settings.tg_bot_token) document.getElementById('tg_bot_token').value = data.settings.tg_bot_token;
+                        if (data.settings.tg_admin_chat_id) document.getElementById('tg_admin_chat_id').value = data.settings.tg_admin_chat_id;
                     }
 
-                    // E'lonlar jadvalini to'ldirish
                     const tableBody = document.getElementById('admin-products-table');
                     if (data.products && data.products.length > 0) {
                         tableBody.innerHTML = data.products.map(p => `
@@ -826,10 +887,10 @@
                             </tr>
                         `).join('');
                     } else {
-                        tableBody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-400">Hozircha hech qanday e\'lon joylashtirilmagan.</td></tr>';
+                        tableBody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-400">Hozircha hech qanday e\'lon mavjud emas.</td></tr>';
                     }
                 } else {
-                    alert(data.message || 'Admin ma\'lumotlarini yuklashda xatolik!');
+                    alert(data.message || 'Xatolik yuz berdi!');
                 }
             } catch (err) {
                 alert('Server bilan bog‘lanishda xato: ' + err.message);
@@ -888,11 +949,8 @@
                 admin_id: currentUser.id,
                 admin_card_number: document.getElementById('admin_card_number').value,
                 admin_card_holder: document.getElementById('admin_card_holder').value,
-                click_service_id: document.getElementById('click_service_id').value,
-                click_merchant_id: document.getElementById('click_merchant_id').value,
-                click_secret_key: document.getElementById('click_secret_key').value,
-                payme_merchant_id: document.getElementById('payme_merchant_id').value,
-                payme_secret_key: document.getElementById('payme_secret_key').value
+                tg_bot_token: document.getElementById('tg_bot_token').value,
+                tg_admin_chat_id: document.getElementById('tg_admin_chat_id').value
             };
             const res = await fetch('/api/admin_actions.php', {
                 method: 'POST',
@@ -901,6 +959,7 @@
             });
             const data = await res.json();
             alert(data.message || 'Saqlandi');
+            openAdminPanel();
         }
 
         async function withdrawAdminProfit() {
