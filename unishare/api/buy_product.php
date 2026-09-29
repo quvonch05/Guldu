@@ -1,14 +1,15 @@
 <?php
-// api/buy_product.php
+// unishare/api/buy_product.php
 header('Content-Type: application/json');
 require_once __DIR__ . '/../config/db.php';
 
 $data = json_decode(file_get_contents('php://input'), true);
-$buyer_id = (int)($data['buyer_id'] ?? 0);
+$buyer_id   = (int)($data['buyer_id'] ?? 0);
 $product_id = (int)($data['product_id'] ?? 0);
 
 if (!$buyer_id || !$product_id) {
-    echo json_encode(['status' => 'error', 'message' => 'Parametrlar yetarli emas']);
+    http_response_code(400);
+    echo json_encode(['status' => 'error', 'message' => 'Noto‘g‘ri so‘rov!']);
     exit;
 }
 
@@ -16,16 +17,16 @@ try {
     $pdo->beginTransaction();
 
     // 1. Mahsulotni tekshirish
-    $stmt = $pdo->prepare("SELECT * FROM products WHERE id = ? AND status = 'active' FOR UPDATE");
+    $stmt = $pdo->prepare("SELECT * FROM products WHERE id = ? FOR UPDATE");
     $stmt->execute([$product_id]);
     $product = $stmt->fetch();
 
-    if (!$product) {
-        throw new Exception("Mahsulot topilmadi yoki sotuvdan olingan");
+    if (!$product || $product['status'] !== 'active') {
+        throw new Exception("Mahsulot topilmadi yoki allaqachon sotilgan!");
     }
 
-    if ($product['user_id'] == $buyer_id) {
-        throw new Exception("O‘z mahsulotingizni xarid qila olmaysiz");
+    if ($product['seller_id'] == $buyer_id) {
+        throw new Exception("O‘zingiz joylagan mahsulotni sotib ololmaysiz!");
     }
 
     // 2. Xaridor balansini tekshirish
@@ -33,47 +34,33 @@ try {
     $stmt->execute([$buyer_id]);
     $buyer = $stmt->fetch();
 
-    if ($buyer['balance'] < $product['price']) {
-        throw new Exception("Balansingizda yetarli mablag‘ yo‘q. Iltimos, hisobni to‘ldiring.");
+    if (!$buyer || (float)$buyer['balance'] < (float)$product['price']) {
+        throw new Exception("Hisobingizda mablag‘ yetarli emas! Iltimos, hisobingizni to‘ldiring.");
     }
 
-    // 3. Pulni xaridordan yechish
-    $stmt = $pdo->prepare("UPDATE users SET balance = balance - ? WHERE id = ?");
-    $stmt->execute([$product['price'], $buyer_id]);
+    $price = (float)$product['price'];
 
-    // 4. Mahsulot turiga qarab o‘tkazish
-    if ($product['type'] === 'digital_note') {
-        // Raqamli konspekt bo‘lsa: darhol sotuvchiga tushadi (5% platforma xizmat haqi)
-        $commission = $product['price'] * 0.05;
-        $seller_amount = $product['price'] - $commission;
+    // 3. Xaridor balansidan pul yechish
+    $pdo->prepare("UPDATE users SET balance = balance - ? WHERE id = ?")->execute([$price, $buyer_id]);
 
-        $stmt = $pdo->prepare("UPDATE users SET balance = balance + ? WHERE id = ?");
-        $stmt->execute([$seller_amount, $product['user_id']]);
+    // 4. Sotuvchi balansiga pul o'tkazish
+    $pdo->prepare("UPDATE users SET balance = balance + ? WHERE id = ?")->execute([$price, $product['seller_id']]);
 
-        $stmt = $pdo->prepare("INSERT INTO orders (buyer_id, seller_id, product_id, amount, commission_fee, escrow_status) VALUES (?, ?, ?, ?, ?, 'completed')");
-        $stmt->execute([$buyer_id, $product['user_id'], $product_id, $product['price'], $commission]);
+    // 5. Mahsulot statusini 'sold' qilish
+    $pdo->prepare("UPDATE products SET status = 'sold' WHERE id = ?")->execute([$product_id]);
 
-        $pdo->commit();
-        echo json_encode([
-            'status' => 'success',
-            'message' => 'Material muvaffaqiyatli xarid qilindi!',
-            'download_url' => "/api/download.php?user_id={$buyer_id}&product_id={$product_id}"
-        ]);
-    } else {
-        // Kitob yoki Print xizmati: Escrowda pul muzlatiladi
-        $secret_code = strtoupper(bin2hex(random_bytes(4))); // 8 belgili kod
-        $stmt = $pdo->prepare("INSERT INTO orders (buyer_id, seller_id, product_id, amount, escrow_status, secret_qr_code) VALUES (?, ?, ?, ?, 'frozen', ?)");
-        $stmt->execute([$buyer_id, $product['user_id'], $product_id, $product['price'], $secret_code]);
+    // 6. Buyurtmalar tarixiga yozish
+    $pdo->prepare("INSERT INTO orders (buyer_id, product_id, amount, status) VALUES (?, ?, ?, 'completed')")
+        ->execute([$buyer_id, $product_id, $price]);
 
-        $pdo->commit();
-        echo json_encode([
-            'status' => 'success',
-            'message' => "Mablag‘ muzlatildi. Buyumni/xizmatni olgach ushbu maxfiy kodni topshiring: {$secret_code}",
-            'escrow_code' => $secret_code
-        ]);
-    }
+    $pdo->commit();
+
+    // Yangilangan balansni qaytarish
+    $newBal = $pdo->query("SELECT balance FROM users WHERE id = $buyer_id")->fetchColumn();
+    echo json_encode(['status' => 'success', 'message' => 'Xarid muvaffaqiyatli amalga oshirildi!', 'new_balance' => $newBal]);
 
 } catch (Exception $e) {
-    $pdo->rollBack();
+    if ($pdo->inTransaction()) $pdo->rollBack();
+    http_response_code(400);
     echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
 }

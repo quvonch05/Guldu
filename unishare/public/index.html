@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UniShare — Talabalar Birjasi & Savdo Maydoni</title>
+    <title>UniShare — Talabalar Birjasi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -12,11 +12,6 @@
             50% { transform: translateY(-8px); }
         }
         .motion-float { animation: float 4s ease-in-out infinite; }
-        .glass {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(14px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
         .glass-dark {
             background: rgba(15, 23, 42, 0.85);
             backdrop-filter: blur(16px);
@@ -36,15 +31,18 @@
                 <span class="text-2xl font-black tracking-tight bg-gradient-to-r from-white via-indigo-200 to-purple-300 bg-clip-text text-transparent">UniShare</span>
             </div>
 
-            <div class="flex items-center gap-4">
-                <button id="post-btn" onclick="openModal('post-modal')" class="hidden px-4 py-2 rounded-xl bg-indigo-600/30 border border-indigo-500/40 hover:bg-indigo-600 transition-all duration-300 hover:scale-105 active:scale-95 text-sm font-semibold flex items-center gap-2">
-                    <i class="fa-solid fa-plus text-indigo-400"></i> E'lon berish
+            <div class="flex items-center gap-3">
+                <button id="topup-nav-btn" onclick="openModal('topup-modal')" class="hidden px-3.5 py-2 rounded-xl bg-emerald-500/20 border border-emerald-500/40 hover:bg-emerald-500/40 text-emerald-300 transition-all duration-300 text-sm font-semibold flex items-center gap-1.5">
+                    <i class="fa-solid fa-wallet"></i> <span class="hidden sm:inline">Hisobni to‘ldirish</span>
                 </button>
-                <button id="admin-nav-btn" onclick="openAdminPanel()" class="hidden px-4 py-2 rounded-xl bg-amber-500/20 border border-amber-500/40 hover:bg-amber-500/40 text-amber-300 transition-all duration-300 hover:scale-105 text-sm font-semibold flex items-center gap-2">
-                    <i class="fa-solid fa-shield-halved"></i> Admin Boshqaruv
+                <button id="post-btn" onclick="openModal('post-modal')" class="hidden px-4 py-2 rounded-xl bg-indigo-600/30 border border-indigo-500/40 hover:bg-indigo-600 transition-all duration-300 text-sm font-semibold flex items-center gap-2">
+                    <i class="fa-solid fa-plus text-indigo-400"></i> <span class="hidden sm:inline">E'lon berish</span>
+                </button>
+                <button id="admin-nav-btn" onclick="openAdminPanel()" class="hidden px-3.5 py-2 rounded-xl bg-amber-500/20 border border-amber-500/40 hover:bg-amber-500/40 text-amber-300 transition-all duration-300 text-sm font-semibold flex items-center gap-2">
+                    <i class="fa-solid fa-shield-halved"></i> Admin
                 </button>
                 <div id="auth-actions">
-                    <button onclick="openModal('auth-modal')" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold text-sm hover:shadow-lg hover:shadow-indigo-500/40 transition-all duration-300 hover:scale-105">
+                    <button onclick="openModal('auth-modal')" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold text-sm hover:shadow-lg hover:shadow-indigo-500/40 transition">
                         Kirish
                     </button>
                 </div>
@@ -59,7 +57,7 @@
             <div class="max-w-2xl relative z-10">
                 <span class="px-3.5 py-1.5 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-xs font-semibold uppercase tracking-wider mb-4 inline-block">Talabalar Ekotizimi</span>
                 <h1 class="text-4xl sm:text-5xl font-black tracking-tight leading-tight mb-4">Talabalar uchun qulay, tezkor va xavfsiz birja</h1>
-                <p class="text-slate-300 text-base mb-6 leading-relaxed">Kitoblar, konspektlar, texnikalar va xizmatlar almashinuvi. Hamyonbop narxlar va tasdiqlangan talabalar tarmog‘i.</p>
+                <p class="text-slate-300 text-base leading-relaxed">Kitoblar, konspektlar, texnikalar va xizmatlar almashinuvi. Hamyonbop narxlar va tasdiqlangan talabalar tarmog‘i.</p>
             </div>
             <div class="absolute right-6 -bottom-6 opacity-20 lg:opacity-40 motion-float pointer-events-none">
                 <i class="fa-solid fa-cube text-9xl text-indigo-400"></i>
@@ -77,7 +75,7 @@
                 </button>
             </div>
             <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                <!-- Mahsulotlar kartalari JS orqali joylanadi -->
+                <!-- JS orqali kartalar joylanadi -->
             </div>
         </div>
 
@@ -120,71 +118,71 @@
                 </div>
             </div>
 
-            <!-- Two Column Admin Tools -->
+            <!-- Management Tools -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Payment Config Module -->
+                <!-- Payment Config -->
                 <div class="glass-dark p-6 rounded-3xl border border-slate-700/60 shadow-xl space-y-4">
                     <h3 class="text-xl font-bold text-slate-200 flex items-center gap-2">
                         <i class="fa-solid fa-credit-card text-emerald-400"></i> To‘lov Tizimlari Sozlamalari (Click & Payme)
                     </h3>
-                    <p class="text-xs text-slate-400">Talabalar hisobini to‘ldirish uchun billing kalitlarini boshqaring</p>
+                    <p class="text-xs text-slate-400">Talabalar hisobini to‘ldirish uchun billing kalitlari</p>
                     <div class="space-y-3 pt-2">
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label class="text-xs text-slate-400">Click Service ID</label>
-                                <input id="click_service_id" type="text" class="w-full mt-1 bg-slate-800/80 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none" placeholder="12345">
+                                <input id="click_service_id" type="text" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none" placeholder="12345">
                             </div>
                             <div>
                                 <label class="text-xs text-slate-400">Click Merchant ID</label>
-                                <input id="click_merchant_id" type="text" class="w-full mt-1 bg-slate-800/80 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none" placeholder="6789">
+                                <input id="click_merchant_id" type="text" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none" placeholder="6789">
                             </div>
                         </div>
                         <div>
                             <label class="text-xs text-slate-400">Click Secret Key</label>
-                            <input id="click_secret_key" type="password" class="w-full mt-1 bg-slate-800/80 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none" placeholder="••••••••">
+                            <input id="click_secret_key" type="password" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none" placeholder="••••••••">
                         </div>
                         <div class="grid grid-cols-2 gap-3 pt-2">
                             <div>
                                 <label class="text-xs text-slate-400">Payme Merchant ID</label>
-                                <input id="payme_merchant_id" type="text" class="w-full mt-1 bg-slate-800/80 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none" placeholder="Payme ID">
+                                <input id="payme_merchant_id" type="text" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none" placeholder="Payme ID">
                             </div>
                             <div>
                                 <label class="text-xs text-slate-400">Payme Secret Key</label>
-                                <input id="payme_secret_key" type="password" class="w-full mt-1 bg-slate-800/80 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none" placeholder="••••••••">
+                                <input id="payme_secret_key" type="password" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none" placeholder="••••••••">
                             </div>
                         </div>
-                        <button onclick="savePaymentKeys()" class="w-full mt-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 font-semibold text-sm transition-all duration-200">
+                        <button onclick="savePaymentKeys()" class="w-full mt-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 font-semibold text-sm transition">
                             Kalitlarni Saqlash
                         </button>
                     </div>
                 </div>
 
-                <!-- Password Reset Module -->
+                <!-- Password Reset -->
                 <div class="glass-dark p-6 rounded-3xl border border-slate-700/60 shadow-xl space-y-4">
                     <h3 class="text-xl font-bold text-slate-200 flex items-center gap-2">
                         <i class="fa-solid fa-key text-amber-400"></i> Foydalanuvchi Parolini O‘zgartirish
                     </h3>
-                    <p class="text-xs text-slate-400">Bloklangan yoki parolini unutgan talabalar uchun yangi parol belgilang</p>
+                    <p class="text-xs text-slate-400">Parolini unutgan talabalar uchun yangi parol belgilang</p>
                     <div class="space-y-3 pt-2">
                         <div>
                             <label class="text-xs text-slate-400">Foydalanuvchi ID raqami</label>
-                            <input id="reset_user_id" type="number" class="w-full mt-1 bg-slate-800/80 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:border-amber-500 focus:outline-none" placeholder="Masalan: 1">
+                            <input id="reset_user_id" type="number" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:border-amber-500 focus:outline-none" placeholder="Masalan: 1">
                         </div>
                         <div>
                             <label class="text-xs text-slate-400">Yangi Parol</label>
-                            <input id="reset_password_val" type="text" class="w-full mt-1 bg-slate-800/80 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:border-amber-500 focus:outline-none" placeholder="Yangi parol">
+                            <input id="reset_password_val" type="text" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:border-amber-500 focus:outline-none" placeholder="Yangi parol">
                         </div>
-                        <button onclick="resetUserPassword()" class="w-full mt-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 font-semibold text-sm transition-all duration-200">
+                        <button onclick="resetUserPassword()" class="w-full mt-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 font-semibold text-sm transition">
                             Parolni Yangilash
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Users & Management Table -->
+            <!-- Users Table -->
             <div class="glass-dark p-6 rounded-3xl border border-slate-700/60">
                 <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
-                    <i class="fa-solid fa-list-check text-indigo-400"></i> Ro‘yxatdagi Talabalar va Foydalanuvchilar
+                    <i class="fa-solid fa-list-check text-indigo-400"></i> Ro‘yxatdagi Talabalar
                 </h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-sm text-slate-300">
@@ -199,7 +197,6 @@
                             </tr>
                         </thead>
                         <tbody id="admin-users-table" class="divide-y divide-slate-800">
-                            <!-- JS orqali to'ldiriladi -->
                         </tbody>
                     </table>
                 </div>
@@ -207,11 +204,48 @@
         </div>
     </main>
 
-    <!-- Modal: Auth (Kirish & Ro'yxatdan o'tish) -->
+    <!-- Modal: Hisobni to'ldirish (Top-up) -->
+    <div id="topup-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center hidden p-4">
+        <div class="glass-dark w-full max-w-md p-8 rounded-3xl border border-emerald-500/30 shadow-2xl relative">
+            <button onclick="closeModal('topup-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-2xl font-bold mb-2 text-center text-emerald-400 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-wallet"></i> Hisobni to‘ldirish
+            </h3>
+            <p class="text-xs text-slate-400 text-center mb-6">Mablag‘ bir zumda balansingizga tushadi</p>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs text-slate-400">To‘lov tizimini tanlang</label>
+                    <div class="grid grid-cols-2 gap-3 mt-1.5">
+                        <label class="cursor-pointer border border-slate-700 rounded-xl p-3 flex items-center gap-2 bg-slate-800/60 hover:border-emerald-500 transition">
+                            <input type="radio" name="topup_system" value="click" checked class="text-emerald-500">
+                            <span class="text-sm font-bold text-sky-400">Click</span>
+                        </label>
+                        <label class="cursor-pointer border border-slate-700 rounded-xl p-3 flex items-center gap-2 bg-slate-800/60 hover:border-emerald-500 transition">
+                            <input type="radio" name="topup_system" value="payme" class="text-emerald-500">
+                            <span class="text-sm font-bold text-teal-300">Payme</span>
+                        </label>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400">Summa (UZS)</label>
+                    <input id="topup_amount" type="number" step="1000" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:border-emerald-500 focus:outline-none" placeholder="Masalan: 50000">
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="document.getElementById('topup_amount').value=20000" class="flex-1 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-xs hover:border-emerald-500">+20,000</button>
+                    <button onclick="document.getElementById('topup_amount').value=50000" class="flex-1 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-xs hover:border-emerald-500">+50,000</button>
+                    <button onclick="document.getElementById('topup_amount').value=100000" class="flex-1 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-xs hover:border-emerald-500">+100,000</button>
+                </div>
+                <button onclick="handleTopupSubmit()" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 font-bold text-sm shadow-lg hover:shadow-emerald-500/40 hover:scale-[1.02] transition">
+                    To‘lash va Balansni to‘ldirish
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Auth (Kirish / Ro'yxatdan o'tish) -->
     <div id="auth-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center hidden p-4">
         <div class="glass-dark w-full max-w-md p-8 rounded-3xl border border-indigo-500/30 shadow-2xl relative">
             <button onclick="closeModal('auth-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            
             <div id="auth-form-wrapper">
                 <h3 id="modal-title" class="text-2xl font-bold mb-6 text-center">Tizimga kirish</h3>
                 <div class="space-y-4">
@@ -231,7 +265,7 @@
                         <label class="text-xs text-slate-400">Parol</label>
                         <input id="input_password" type="password" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:border-indigo-500 focus:outline-none" placeholder="••••••••">
                     </div>
-                    <button id="auth-submit-btn" onclick="handleAuthSubmit()" class="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 font-bold text-sm shadow-lg hover:shadow-indigo-500/40 hover:scale-[1.02] active:scale-95 transition">
+                    <button id="auth-submit-btn" onclick="handleAuthSubmit()" class="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 font-bold text-sm shadow-lg hover:shadow-indigo-500/40 hover:scale-[1.02] transition">
                         Kirish
                     </button>
                     <div class="text-center text-xs text-slate-400 pt-2">
@@ -243,7 +277,7 @@
         </div>
     </div>
 
-    <!-- Modal: E'lon joylash -->
+    <!-- Modal: E'lon berish -->
     <div id="post-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center hidden p-4">
         <div class="glass-dark w-full max-w-lg p-8 rounded-3xl border border-indigo-500/30 shadow-2xl relative">
             <button onclick="closeModal('post-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -350,25 +384,28 @@
         function renderUserUI() {
             const authActions = document.getElementById('auth-actions');
             const postBtn = document.getElementById('post-btn');
+            const topupBtn = document.getElementById('topup-nav-btn');
             const adminNavBtn = document.getElementById('admin-nav-btn');
 
             if (currentUser) {
                 postBtn.classList.remove('hidden');
+                topupBtn.classList.remove('hidden');
                 if (currentUser.role === 'admin') adminNavBtn.classList.remove('hidden');
 
                 authActions.innerHTML = `
                     <div class="flex items-center gap-3">
                         <div class="text-right hidden sm:block">
                             <div class="text-xs font-bold text-white">${currentUser.full_name}</div>
-                            <div class="text-[10px] text-indigo-300 font-mono">${currentUser.student_id} (${currentUser.balance} UZS)</div>
+                            <div class="text-[11px] text-emerald-400 font-mono font-bold">${parseFloat(currentUser.balance).toLocaleString()} UZS</div>
                         </div>
-                        <button onclick="logout()" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-rose-500/20 hover:text-rose-400 border border-slate-700 flex items-center justify-center transition">
+                        <button onclick="logout()" title="Chiqish" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-rose-500/20 hover:text-rose-400 border border-slate-700 flex items-center justify-center transition">
                             <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
                         </button>
                     </div>
                 `;
             } else {
                 postBtn.classList.add('hidden');
+                topupBtn.classList.add('hidden');
                 adminNavBtn.classList.add('hidden');
                 authActions.innerHTML = `
                     <button onclick="openModal('auth-modal')" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold text-sm hover:shadow-lg hover:shadow-indigo-500/40 transition">
@@ -383,6 +420,31 @@
             currentUser = null;
             renderUserUI();
             switchView('catalog');
+            loadProducts();
+        }
+
+        async function handleTopupSubmit() {
+            if (!currentUser) return alert('Avval tizimga kiring!');
+            const amount = parseFloat(document.getElementById('topup_amount').value);
+            const system = document.querySelector('input[name="topup_system"]:checked').value;
+
+            if (!amount || amount <= 0) return alert('Summani to‘g‘ri kiriting!');
+
+            const res = await fetch('/api/topup_balance.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: currentUser.id, amount: amount, system: system })
+            });
+            const data = await res.json();
+            if (data.status === 'success') {
+                currentUser.balance = data.new_balance;
+                localStorage.setItem('unishare_user', JSON.stringify(currentUser));
+                renderUserUI();
+                closeModal('topup-modal');
+                alert(data.message);
+            } else {
+                alert(data.message || 'Xatolik!');
+            }
         }
 
         async function submitProduct() {
@@ -411,6 +473,38 @@
             }
         }
 
+        async function buyProduct(productId, price, title) {
+            if (!currentUser) {
+                openModal('auth-modal');
+                return alert('Xarid qilish uchun avval tizimga kiring!');
+            }
+
+            if (parseFloat(currentUser.balance) < parseFloat(price)) {
+                if (confirm(`Hisobingizda mablag‘ yetarli emas!\nKerak: ${parseFloat(price).toLocaleString()} UZS\nSizda: ${parseFloat(currentUser.balance).toLocaleString()} UZS\n\nHisobingizni hozir to‘ldirasizmi?`)) {
+                    openModal('topup-modal');
+                }
+                return;
+            }
+
+            if (!confirm(`"${title}" mahsulotini ${parseFloat(price).toLocaleString()} UZS evaziga sotib olasizmi?`)) return;
+
+            const res = await fetch('/api/buy_product.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ buyer_id: currentUser.id, product_id: productId })
+            });
+            const data = await res.json();
+            if (data.status === 'success') {
+                currentUser.balance = data.new_balance;
+                localStorage.setItem('unishare_user', JSON.stringify(currentUser));
+                renderUserUI();
+                alert(data.message);
+                loadProducts();
+            } else {
+                alert(data.message || 'Xatolik yuz berdi!');
+            }
+        }
+
         async function loadProducts() {
             const grid = document.getElementById('products-grid');
             try {
@@ -423,22 +517,36 @@
                     return;
                 }
 
-                grid.innerHTML = products.map(p => `
-                    <div class="glass-dark rounded-2xl overflow-hidden border border-slate-700/60 hover:border-indigo-500/50 transition-all duration-300 hover:-translate-y-2 group shadow-lg">
-                        <div class="h-44 overflow-hidden relative">
-                            <img src="${p.image_url || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500'}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="${p.title}">
-                            <span class="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-lg text-[10px] font-semibold text-indigo-300 uppercase">${p.category}</span>
-                        </div>
-                        <div class="p-4 space-y-2">
-                            <h4 class="font-bold text-base truncate text-slate-100">${p.title}</h4>
-                            <p class="text-xs text-slate-400 line-clamp-2">${p.description || 'Tavsif berilmagan'}</p>
-                            <div class="pt-2 flex items-center justify-between border-t border-slate-800">
-                                <span class="text-indigo-400 font-extrabold text-sm">${parseFloat(p.price).toLocaleString()} UZS</span>
-                                <span class="text-[11px] text-slate-400"><i class="fa-regular fa-user mr-1"></i>${p.author_name}</span>
+                grid.innerHTML = products.map(p => {
+                    const isOwn = currentUser && currentUser.id == p.seller_id;
+                    return `
+                    <div class="glass-dark rounded-2xl overflow-hidden border border-slate-700/60 hover:border-indigo-500/50 transition-all duration-300 hover:-translate-y-1 group shadow-lg flex flex-col justify-between">
+                        <div>
+                            <div class="h-44 overflow-hidden relative">
+                                <img src="${p.image_url || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500'}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="${p.title}">
+                                <span class="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-lg text-[10px] font-semibold text-indigo-300 uppercase">${p.category}</span>
+                            </div>
+                            <div class="p-4 space-y-2">
+                                <h4 class="font-bold text-base truncate text-slate-100">${p.title}</h4>
+                                <p class="text-xs text-slate-400 line-clamp-2">${p.description || 'Tavsif berilmagan'}</p>
+                                <div class="pt-2 flex items-center justify-between border-t border-slate-800/80">
+                                    <span class="text-indigo-400 font-extrabold text-sm">${parseFloat(p.price).toLocaleString()} UZS</span>
+                                    <span class="text-[11px] text-slate-400 truncate max-w-[120px]"><i class="fa-regular fa-user mr-1"></i>${p.author_name}</span>
+                                </div>
                             </div>
                         </div>
+                        <div class="p-4 pt-0">
+                            ${isOwn ? `
+                                <div class="w-full py-2 rounded-xl bg-slate-800 text-center text-xs font-semibold text-slate-400">O‘zingizning e'loningiz</div>
+                            ` : `
+                                <button onclick="buyProduct(${p.id}, ${p.price}, '${p.title.replace(/'/g, "\\'")}')" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 font-bold text-xs tracking-wide shadow-md hover:shadow-emerald-500/30 transition flex items-center justify-center gap-1.5">
+                                    <i class="fa-solid fa-cart-shopping"></i> Sotib olish
+                                </button>
+                            `}
+                        </div>
                     </div>
-                `).join('');
+                    `;
+                }).join('');
             } catch (err) {
                 grid.innerHTML = '<div class="col-span-full py-8 text-center text-rose-400">E\'lonlarni yuklashda xatolik yuz berdi.</div>';
             }
@@ -494,7 +602,7 @@
                 body: JSON.stringify(payload)
             });
             const data = await res.json();
-            alert(data.message || (data.status === 'success' ? 'Saqlandi' : 'Xatolik'));
+            alert(data.message || 'Bajarildi');
         }
 
         async function resetUserPassword() {
@@ -508,7 +616,7 @@
                 body: JSON.stringify({ action: 'reset_password', admin_id: currentUser.id, target_user_id: userId, new_password: newPass })
             });
             const data = await res.json();
-            alert(data.message || (data.status === 'success' ? 'Yangilandi' : 'Xatolik'));
+            alert(data.message || 'Bajarildi');
         }
     </script>
 </body>
