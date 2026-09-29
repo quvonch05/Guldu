@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UniShare — Talabalar Birjasi</title>
+    <title>UniShare — Talabalar Birjasi & Ekotizimi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -31,16 +31,28 @@
                 <span class="text-2xl font-black tracking-tight bg-gradient-to-r from-white via-indigo-200 to-purple-300 bg-clip-text text-transparent">UniShare</span>
             </div>
 
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Hisob to'ldirish tugmasi -->
                 <button id="topup-nav-btn" onclick="openModal('topup-modal')" class="hidden px-3.5 py-2 rounded-xl bg-emerald-500/20 border border-emerald-500/40 hover:bg-emerald-500/40 text-emerald-300 transition-all duration-300 text-sm font-semibold flex items-center gap-1.5">
-                    <i class="fa-solid fa-wallet"></i> <span class="hidden sm:inline">Hisobni to‘ldirish</span>
+                    <i class="fa-solid fa-wallet"></i> <span class="hidden md:inline">Hisobni to‘ldirish</span>
                 </button>
-                <button id="post-btn" onclick="openModal('post-modal')" class="hidden px-4 py-2 rounded-xl bg-indigo-600/30 border border-indigo-500/40 hover:bg-indigo-600 transition-all duration-300 text-sm font-semibold flex items-center gap-2">
-                    <i class="fa-solid fa-plus text-indigo-400"></i> <span class="hidden sm:inline">E'lon berish</span>
+
+                <!-- Mening Xaridlarim tugmasi -->
+                <button id="my-orders-btn" onclick="openMyOrdersModal()" class="hidden px-3.5 py-2 rounded-xl bg-purple-500/20 border border-purple-500/40 hover:bg-purple-500/40 text-purple-300 transition-all duration-300 text-sm font-semibold flex items-center gap-1.5">
+                    <i class="fa-solid fa-box-open"></i> <span class="hidden md:inline">Xaridlarim</span>
                 </button>
+
+                <!-- E'lon berish tugmasi -->
+                <button id="post-btn" onclick="openModal('post-modal')" class="hidden px-3.5 py-2 rounded-xl bg-indigo-600/30 border border-indigo-500/40 hover:bg-indigo-600 transition-all duration-300 text-sm font-semibold flex items-center gap-2">
+                    <i class="fa-solid fa-plus text-indigo-400"></i> <span class="hidden md:inline">E'lon berish</span>
+                </button>
+
+                <!-- Admin Boshqaruv tugmasi -->
                 <button id="admin-nav-btn" onclick="openAdminPanel()" class="hidden px-3.5 py-2 rounded-xl bg-amber-500/20 border border-amber-500/40 hover:bg-amber-500/40 text-amber-300 transition-all duration-300 text-sm font-semibold flex items-center gap-2">
-                    <i class="fa-solid fa-shield-halved"></i> Admin
+                    <i class="fa-solid fa-shield-halved"></i> <span class="hidden md:inline">Admin</span>
                 </button>
+
+                <!-- Kirish / Chiqish -->
                 <div id="auth-actions">
                     <button onclick="openModal('auth-modal')" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold text-sm hover:shadow-lg hover:shadow-indigo-500/40 transition">
                         Kirish
@@ -50,9 +62,9 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
+    <!-- Asosiy qism -->
     <main class="max-w-7xl mx-auto px-6 py-10">
-        <!-- Hero Section -->
+        <!-- Banner -->
         <div id="hero-banner" class="relative rounded-3xl overflow-hidden p-8 sm:p-12 mb-12 border border-indigo-500/20 bg-gradient-to-r from-indigo-900/40 via-purple-900/20 to-slate-900/60 shadow-2xl">
             <div class="max-w-2xl relative z-10">
                 <span class="px-3.5 py-1.5 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-xs font-semibold uppercase tracking-wider mb-4 inline-block">Talabalar Ekotizimi</span>
@@ -64,7 +76,7 @@
             </div>
         </div>
 
-        <!-- Catalog Container -->
+        <!-- Mahsulotlar Katalogi -->
         <div id="catalog-section">
             <div class="flex items-center justify-between mb-8">
                 <h2 class="text-2xl font-bold flex items-center gap-2">
@@ -75,11 +87,11 @@
                 </button>
             </div>
             <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                <!-- JS orqali kartalar joylanadi -->
+                <!-- E'lonlar JS orqali joylanadi -->
             </div>
         </div>
 
-        <!-- Admin Control Section -->
+        <!-- Admin Paneli -->
         <div id="admin-section" class="hidden space-y-10">
             <div class="flex items-center justify-between border-b border-slate-700 pb-4">
                 <div>
@@ -93,7 +105,7 @@
                 </button>
             </div>
 
-            <!-- Stats Grid -->
+            <!-- Statistika -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="glass-dark p-6 rounded-2xl border border-indigo-500/20 flex items-center justify-between">
                     <div>
@@ -118,14 +130,13 @@
                 </div>
             </div>
 
-            <!-- Management Tools -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Payment Config -->
+                <!-- To'lov sozlamalari -->
                 <div class="glass-dark p-6 rounded-3xl border border-slate-700/60 shadow-xl space-y-4">
                     <h3 class="text-xl font-bold text-slate-200 flex items-center gap-2">
-                        <i class="fa-solid fa-credit-card text-emerald-400"></i> To‘lov Tizimlari Sozlamalari (Click & Payme)
+                        <i class="fa-solid fa-credit-card text-emerald-400"></i> To‘lov Tizimlari Kalitlari (Click & Payme)
                     </h3>
-                    <p class="text-xs text-slate-400">Talabalar hisobini to‘ldirish uchun billing kalitlari</p>
+                    <p class="text-xs text-slate-400">Talabalar hisobini haqiqiy to‘ldirishi uchun billing sozlamalari</p>
                     <div class="space-y-3 pt-2">
                         <div class="grid grid-cols-2 gap-3">
                             <div>
@@ -157,7 +168,7 @@
                     </div>
                 </div>
 
-                <!-- Password Reset -->
+                <!-- Parolni tiklash -->
                 <div class="glass-dark p-6 rounded-3xl border border-slate-700/60 shadow-xl space-y-4">
                     <h3 class="text-xl font-bold text-slate-200 flex items-center gap-2">
                         <i class="fa-solid fa-key text-amber-400"></i> Foydalanuvchi Parolini O‘zgartirish
@@ -179,7 +190,7 @@
                 </div>
             </div>
 
-            <!-- Users Table -->
+            <!-- Foydalanuvchilar ro'yxati -->
             <div class="glass-dark p-6 rounded-3xl border border-slate-700/60">
                 <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
                     <i class="fa-solid fa-list-check text-indigo-400"></i> Ro‘yxatdagi Talabalar
@@ -196,15 +207,26 @@
                                 <th class="p-3">Balans</th>
                             </tr>
                         </thead>
-                        <tbody id="admin-users-table" class="divide-y divide-slate-800">
-                        </tbody>
+                        <tbody id="admin-users-table" class="divide-y divide-slate-800"></tbody>
                     </table>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Modal: Hisobni to'ldirish (Top-up) -->
+    <!-- Modal: Mening Xaridlarim -->
+    <div id="orders-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center hidden p-4">
+        <div class="glass-dark w-full max-w-2xl p-6 sm:p-8 rounded-3xl border border-purple-500/30 shadow-2xl relative max-h-[85vh] flex flex-col">
+            <button onclick="closeModal('orders-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-2xl font-bold mb-1 text-purple-300 flex items-center gap-2">
+                <i class="fa-solid fa-bag-shopping"></i> Mening Xaridlarim
+            </h3>
+            <p class="text-xs text-slate-400 mb-6">Siz sotib olgan materiallar, fayllar va sotuvchi ma'lumotlari</p>
+            <div id="my-orders-container" class="space-y-4 overflow-y-auto pr-2 flex-1"></div>
+        </div>
+    </div>
+
+    <!-- Modal: Hisobni to'ldirish -->
     <div id="topup-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center hidden p-4">
         <div class="glass-dark w-full max-w-md p-8 rounded-3xl border border-emerald-500/30 shadow-2xl relative">
             <button onclick="closeModal('topup-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -285,12 +307,12 @@
             <div class="space-y-4">
                 <div>
                     <label class="text-xs text-slate-400">Sarlavha</label>
-                    <input id="post_title" type="text" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none" placeholder="Masalan: Fizika kitobi 1-kurs">
+                    <input id="post_title" type="text" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none" placeholder="Masalan: Matematika 1-kurs konspekti">
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="text-xs text-slate-400">Narx (UZS)</label>
-                        <input id="post_price" type="number" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none" placeholder="45000">
+                        <input id="post_price" type="number" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none" placeholder="25000">
                     </div>
                     <div>
                         <label class="text-xs text-slate-400">Kategoriya</label>
@@ -304,12 +326,12 @@
                     </div>
                 </div>
                 <div>
-                    <label class="text-xs text-slate-400">Rasm havolasi (URL)</label>
-                    <input id="post_image" type="text" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none" placeholder="https://images.unsplash.com/...">
+                    <label class="text-xs text-slate-400">Rasm yoki Fayl havolasi (URL)</label>
+                    <input id="post_image" type="text" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none" placeholder="https://images.unsplash.com/... yoki Google Drive link">
                 </div>
                 <div>
                     <label class="text-xs text-slate-400">Tavsif</label>
-                    <textarea id="post_description" rows="3" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none" placeholder="Mahsulot holati haqida ma'lumot"></textarea>
+                    <textarea id="post_description" rows="3" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none" placeholder="Mahsulot yoki fayl haqida qisqacha ma'lumot"></textarea>
                 </div>
                 <button onclick="submitProduct()" class="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 font-bold text-sm shadow-lg hover:shadow-indigo-500/40 hover:scale-[1.02] transition">
                     Joylashtirish
@@ -318,7 +340,7 @@
         </div>
     </div>
 
-    <!-- Application Script -->
+    <!-- JavaScript Dastur Logikasi -->
     <script>
         let currentUser = null;
         let isRegister = false;
@@ -372,6 +394,7 @@
                         localStorage.setItem('unishare_user', JSON.stringify(currentUser));
                         closeModal('auth-modal');
                         renderUserUI();
+                        loadProducts();
                     }
                 } else {
                     alert(data.message || 'Xatolik yuz berdi!');
@@ -385,11 +408,13 @@
             const authActions = document.getElementById('auth-actions');
             const postBtn = document.getElementById('post-btn');
             const topupBtn = document.getElementById('topup-nav-btn');
+            const ordersBtn = document.getElementById('my-orders-btn');
             const adminNavBtn = document.getElementById('admin-nav-btn');
 
             if (currentUser) {
                 postBtn.classList.remove('hidden');
                 topupBtn.classList.remove('hidden');
+                ordersBtn.classList.remove('hidden');
                 if (currentUser.role === 'admin') adminNavBtn.classList.remove('hidden');
 
                 authActions.innerHTML = `
@@ -406,6 +431,7 @@
             } else {
                 postBtn.classList.add('hidden');
                 topupBtn.classList.add('hidden');
+                ordersBtn.classList.add('hidden');
                 adminNavBtn.classList.add('hidden');
                 authActions.innerHTML = `
                     <button onclick="openModal('auth-modal')" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold text-sm hover:shadow-lg hover:shadow-indigo-500/40 transition">
@@ -428,7 +454,7 @@
             const amount = parseFloat(document.getElementById('topup_amount').value);
             const system = document.querySelector('input[name="topup_system"]:checked').value;
 
-            if (!amount || amount <= 0) return alert('Summani to‘g‘ri kiriting!');
+            if (!amount || amount < 1000) return alert('Kamida 1,000 UZS kiriting!');
 
             const res = await fetch('/api/topup_balance.php', {
                 method: 'POST',
@@ -436,12 +462,17 @@
                 body: JSON.stringify({ user_id: currentUser.id, amount: amount, system: system })
             });
             const data = await res.json();
+            
             if (data.status === 'success') {
-                currentUser.balance = data.new_balance;
-                localStorage.setItem('unishare_user', JSON.stringify(currentUser));
-                renderUserUI();
-                closeModal('topup-modal');
-                alert(data.message);
+                if (data.mode === 'live' && data.redirect_url) {
+                    window.location.href = data.redirect_url;
+                } else {
+                    currentUser.balance = data.new_balance;
+                    localStorage.setItem('unishare_user', JSON.stringify(currentUser));
+                    renderUserUI();
+                    closeModal('topup-modal');
+                    alert(data.message);
+                }
             } else {
                 alert(data.message || 'Xatolik!');
             }
@@ -502,6 +533,46 @@
                 loadProducts();
             } else {
                 alert(data.message || 'Xatolik yuz berdi!');
+            }
+        }
+
+        async function openMyOrdersModal() {
+            if (!currentUser) return alert('Avval tizimga kiring!');
+            openModal('orders-modal');
+            const container = document.getElementById('my-orders-container');
+            container.innerHTML = '<div class="py-8 text-center text-slate-400">Yuklanmoqda...</div>';
+
+            try {
+                const res = await fetch(`/api/get_my_orders.php?user_id=${currentUser.id}`);
+                const result = await res.json();
+                const orders = result.data || [];
+
+                if (orders.length === 0) {
+                    container.innerHTML = '<div class="py-12 text-center text-slate-400">Siz hali hech narsa sotib olmadingiz.</div>';
+                    return;
+                }
+
+                container.innerHTML = orders.map(o => `
+                    <div class="glass-dark border border-slate-700/80 rounded-2xl p-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                        <div class="flex gap-4 items-center">
+                            <img src="${o.image_url || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=150'}" class="w-16 h-16 rounded-xl object-cover border border-slate-700">
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded">${o.category}</span>
+                                <h4 class="font-bold text-slate-100 text-base mt-1">${o.title}</h4>
+                                <div class="text-xs text-slate-400">Sotuvchi: <span class="text-slate-200 font-semibold">${o.seller_name}</span> (${o.seller_phone || 'Tel ko‘rsatilmagan'})</div>
+                            </div>
+                        </div>
+                        <div class="flex sm:flex-col items-end justify-between w-full sm:w-auto gap-2">
+                            <span class="text-emerald-400 font-bold text-sm">${parseFloat(o.paid_amount).toLocaleString()} UZS</span>
+                            <a href="${o.image_url}" target="_blank" download class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
+                                <i class="fa-solid fa-download"></i> Yuklab olish
+                            </a>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (e) {
+                container.innerHTML = '<div class="py-8 text-center text-rose-400">Ma\'lumotlarni olishda xatolik yuz berdi.</div>';
             }
         }
 
