@@ -13,6 +13,18 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 try {
+    // 0. topup_requests jadvali mavjudligini ta'minlash
+    $pdo->exec("CREATE TABLE IF NOT EXISTS topup_requests (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        amount DECIMAL(12, 2) NOT NULL,
+        `system` VARCHAR(50) DEFAULT 'click',
+        receipt_image LONGTEXT NOT NULL,
+        status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
     $user_id = (int)($_POST['user_id'] ?? 0);
     $amount  = (float)($_POST['amount'] ?? 0);
     $system  = trim($_POST['system'] ?? 'click');
@@ -23,7 +35,7 @@ try {
     }
 
     if (!isset($_FILES['receipt_file']) || $_FILES['receipt_file']['error'] !== UPLOAD_ERR_OK) {
-        echo json_encode(['status' => 'error', 'message' => 'Iltimos, to‘lov kvitansiyasi (chek) skrinshotini yuklang!']);
+        echo json_encode(['status' => 'error', 'message' => 'Iltimos, to‘lov cheki skrinshotini yuklang!']);
         exit;
     }
 
@@ -40,8 +52,8 @@ try {
     $uStmt->execute([$user_id]);
     $user = $uStmt->fetch(PDO::FETCH_ASSOC);
 
-    // So'rovni bazaga yozish
-    $stmt = $pdo->prepare("INSERT INTO topup_requests (user_id, amount, system, receipt_image, status) VALUES (?, ?, ?, ?, 'pending')");
+    // So'rovni bazaga yozish (MySQL rezerv so'zlar uchun `system` teskari tirnoqda)
+    $stmt = $pdo->prepare("INSERT INTO topup_requests (user_id, amount, `system`, receipt_image, status) VALUES (?, ?, ?, ?, 'pending')");
     $stmt->execute([$user_id, $amount, $system, $base64Image]);
     $requestId = $pdo->lastInsertId();
 
