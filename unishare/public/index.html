@@ -82,7 +82,6 @@
 
         <!-- Katalog va Qidiruv / Filtr qismi -->
         <div id="catalog-section" class="space-y-6">
-            <!-- Qidiruv va Kategoriyalar (Responsive) -->
             <div class="flex flex-col sm:flex-row gap-3 items-center justify-between">
                 <div class="relative w-full sm:w-80">
                     <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
@@ -99,10 +98,8 @@
                 </div>
             </div>
 
-            <!-- E'lonlar gridi (Ko'p e'lon bo'lsa ham qat'iy moslashuvchan) -->
-            <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 min-h-[300px]">
-                <!-- Dinamik ravishda JS orqali to'ldiriladi -->
-            </div>
+            <!-- E'lonlar gridi -->
+            <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 min-h-[300px]"></div>
         </div>
 
         <!-- Admin Paneli -->
@@ -144,21 +141,21 @@
                 </div>
                 <div class="glass-dark p-5 rounded-2xl border border-amber-500/30 flex items-center justify-between bg-amber-500/5">
                     <div>
-                        <div class="text-amber-300 text-xs font-medium">Admin Foydasi (Komissiya)</div>
+                        <div class="text-amber-300 text-xs font-medium">Admin Foydasi (5% Komissiya)</div>
                         <div id="stat-admin-balance" class="text-xl sm:text-2xl font-black mt-1 text-amber-400">0 UZS</div>
                     </div>
                     <i class="fa-solid fa-coins text-amber-400 text-2xl"></i>
                 </div>
             </div>
 
-            <!-- 3 Bo'limli Admin Asboblari -->
+            <!-- Asboblar paneli -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- 1. Admin Kartasi va Mablag'ni Chiqarish -->
+                <!-- 1. Admin Kartasi -->
                 <div class="glass-dark p-5 sm:p-6 rounded-3xl border border-amber-500/30 shadow-xl space-y-4">
                     <h3 class="text-lg font-bold text-amber-300 flex items-center gap-2">
                         <i class="fa-solid fa-credit-card"></i> Admin Kartasi & Payout
                     </h3>
-                    <p class="text-xs text-slate-400">Oldi-sotdilardan tushgan 5% komissiya summasini avto-yechish</p>
+                    <p class="text-xs text-slate-400">Oldi-sotdilardan tushgan 5% komissiyani kartaga chiqarish</p>
                     <div class="space-y-3 pt-1">
                         <div>
                             <label class="text-[11px] text-slate-400">Karta raqami (Uzcard / Humo)</label>
@@ -167,10 +164,6 @@
                         <div>
                             <label class="text-[11px] text-slate-400">Karta egasi (F.I.SH)</label>
                             <input id="admin_card_holder" type="text" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:border-amber-500 focus:outline-none" placeholder="QUVONCHBEK BARATOV">
-                        </div>
-                        <div class="flex items-center justify-between pt-1">
-                            <span class="text-xs text-slate-300">Komissiya foizi:</span>
-                            <span class="text-xs font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded">5%</span>
                         </div>
                         <div class="grid grid-cols-2 gap-2 pt-2">
                             <button onclick="saveAdminSettings()" class="py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold transition">
@@ -183,7 +176,7 @@
                     </div>
                 </div>
 
-                <!-- 2. To'lov Shlyuzlari (Click / Payme) -->
+                <!-- 2. To'lov shlyuzlari -->
                 <div class="glass-dark p-5 sm:p-6 rounded-3xl border border-slate-700/80 shadow-xl space-y-4">
                     <h3 class="text-lg font-bold text-slate-200 flex items-center gap-2">
                         <i class="fa-solid fa-sliders text-emerald-400"></i> To‘lov Shlyuz Kalitlari
@@ -205,12 +198,12 @@
                     </div>
                 </div>
 
-                <!-- 3. Parollarni Tiklash -->
+                <!-- 3. Parollarni tiklash -->
                 <div class="glass-dark p-5 sm:p-6 rounded-3xl border border-slate-700/80 shadow-xl space-y-4">
                     <h3 class="text-lg font-bold text-slate-200 flex items-center gap-2">
                         <i class="fa-solid fa-key text-indigo-400"></i> Parolni O‘zgartirish
                     </h3>
-                    <p class="text-xs text-slate-400">Parolini yo‘qotgan talaba hisobini tiklang</p>
+                    <p class="text-xs text-slate-400">Parolini yo‘qotgan talaba hisobini yangilang</p>
                     <div class="space-y-3 pt-1">
                         <div>
                             <label class="text-[11px] text-slate-400">Foydalanuvchi ID</label>
@@ -227,7 +220,7 @@
                 </div>
             </div>
 
-            <!-- E'lonlar va Mahsulotlarni Admin Nazorati -->
+            <!-- E'lonlarni boshqarish jadvali -->
             <div class="glass-dark p-5 sm:p-6 rounded-3xl border border-slate-700/80">
                 <h3 class="text-lg font-bold mb-4 flex items-center gap-2 text-slate-100">
                     <i class="fa-solid fa-boxes-stacked text-purple-400"></i> Barcha E'lonlarni Nazorat Qilish va O‘chirish
@@ -245,9 +238,7 @@
                                 <th class="p-3 text-right">Amal</th>
                             </tr>
                         </thead>
-                        <tbody id="admin-products-table" class="divide-y divide-slate-800">
-                            <!-- JS orqali to'ldiriladi -->
-                        </tbody>
+                        <tbody id="admin-products-table" class="divide-y divide-slate-800"></tbody>
                     </table>
                 </div>
             </div>
@@ -339,7 +330,7 @@
         </div>
     </div>
 
-    <!-- Modal: E'lon berish -->
+    <!-- Modal: E'lon berish (Sotilayotgan fayl bilan) -->
     <div id="post-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center hidden p-4">
         <div class="glass-dark w-full max-w-lg p-6 sm:p-8 rounded-3xl border border-indigo-500/30 shadow-2xl relative">
             <button onclick="closeModal('post-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -347,7 +338,7 @@
             <div class="space-y-3.5">
                 <div>
                     <label class="text-xs text-slate-400">Sarlavha</label>
-                    <input id="post_title" type="text" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none" placeholder="Masalan: Axborot xavfsizligi konspekti">
+                    <input id="post_title" type="text" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none" placeholder="Masalan: Axborot tizimlari konspekti">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
@@ -356,7 +347,7 @@
                     </div>
                     <div>
                         <label class="text-xs text-slate-400">Kategoriya</label>
-                        <select id="post_category" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none">
+                        <select id="post_category" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none">
                             <option>Kitoblar</option>
                             <option>Konspektlar</option>
                             <option>Elektronika</option>
@@ -365,9 +356,17 @@
                         </select>
                     </div>
                 </div>
-                <div>
-                    <label class="text-xs text-slate-400">Rasm yoki Fayl havolasi (URL)</label>
-                    <input id="post_image" type="text" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none" placeholder="https://... yoki fayl havolasi">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-xs text-slate-400">Muqova rasmi (URL)</label>
+                        <input id="post_image" type="text" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm focus:border-indigo-500 focus:outline-none" placeholder="https://... rasm havolasi">
+                    </div>
+                    <div>
+                        <label class="text-xs text-indigo-300 font-semibold flex items-center gap-1">
+                            <i class="fa-solid fa-file-arrow-up"></i> Sotilayotgan fayl (PDF/Link)
+                        </label>
+                        <input id="post_file" type="text" class="w-full mt-1 bg-slate-900 border border-indigo-500/50 rounded-xl px-3 py-2 text-xs sm:text-sm focus:border-indigo-500 focus:outline-none" placeholder="Google Drive yoki PDF linki">
+                    </div>
                 </div>
                 <div>
                     <label class="text-xs text-slate-400">Tavsif</label>
@@ -380,7 +379,7 @@
         </div>
     </div>
 
-    <!-- Frontend JavaScript Dastur Mantig'i -->
+    <!-- Frontend JavaScript -->
     <script>
         let currentUser = null;
         let isRegister = false;
@@ -528,6 +527,7 @@
                 price: parseFloat(document.getElementById('post_price').value),
                 category: document.getElementById('post_category').value,
                 image_url: document.getElementById('post_image').value.trim(),
+                file_url: document.getElementById('post_file').value.trim(),
                 description: document.getElementById('post_description').value.trim()
             };
 
@@ -578,7 +578,6 @@
             }
         }
 
-        // Mening Xaridlarim Modali (Xatoliksiz ko'rsatish)
         async function openMyOrdersModal() {
             if (!currentUser) return alert('Avval tizimga kiring!');
             openModal('orders-modal');
@@ -595,7 +594,9 @@
                     return;
                 }
 
-                container.innerHTML = orders.map(o => `
+                container.innerHTML = orders.map(o => {
+                    const downloadTarget = o.file_url || o.image_url;
+                    return `
                     <div class="glass-dark border border-slate-700/80 rounded-2xl p-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
                         <div class="flex gap-3 items-center">
                             <img src="${o.image_url || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=150'}" class="w-14 h-14 rounded-xl object-cover border border-slate-700">
@@ -607,19 +608,19 @@
                         </div>
                         <div class="flex sm:flex-col items-end justify-between w-full sm:w-auto gap-2">
                             <span class="text-emerald-400 font-bold text-sm">${parseFloat(o.paid_amount).toLocaleString()} UZS</span>
-                            <a href="${o.image_url}" target="_blank" download class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
-                                <i class="fa-solid fa-download"></i> Yuklab olish
+                            <a href="${downloadTarget}" target="_blank" rel="noopener noreferrer" class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-lg transition">
+                                <i class="fa-solid fa-cloud-arrow-down"></i> Faylni yuklab olish
                             </a>
                         </div>
                     </div>
-                `).join('');
+                    `;
+                }).join('');
 
             } catch (e) {
                 container.innerHTML = '<div class="py-8 text-center text-rose-400">Ma\'lumotlarni olishda xatolik yuz berdi.</div>';
             }
         }
 
-        // Katalogdagi e'lonlarni yuklash
         async function loadProducts() {
             const grid = document.getElementById('products-grid');
             try {
@@ -632,7 +633,6 @@
             }
         }
 
-        // Qidiruv va Kategoriya bo'yicha filtrlash
         function setCategory(cat) {
             currentFilter = cat;
             document.querySelectorAll('.cat-filter-btn').forEach(btn => {
@@ -700,7 +700,6 @@
             document.getElementById('admin-section').classList.toggle('hidden', view !== 'admin');
         }
 
-        // Admin Boshqaruv Markazi funksiyalari
         async function openAdminPanel() {
             if (!currentUser || currentUser.role !== 'admin') return alert('Ruxsat yo‘q!');
             switchView('admin');
@@ -717,7 +716,6 @@
                 document.getElementById('stat-turnover').innerText = parseFloat(data.stats.turnover).toLocaleString() + ' UZS';
                 document.getElementById('stat-admin-balance').innerText = parseFloat(data.stats.admin_balance).toLocaleString() + ' UZS';
 
-                // Admin kartasini ko'rsatish
                 if (data.settings) {
                     if (data.settings.admin_card_number) document.getElementById('admin_card_number').value = data.settings.admin_card_number;
                     if (data.settings.admin_card_holder) document.getElementById('admin_card_holder').value = data.settings.admin_card_holder;
@@ -726,7 +724,6 @@
                     if (data.settings.payme_merchant_id) document.getElementById('payme_merchant_id').value = data.settings.payme_merchant_id;
                 }
 
-                // Admin e'lonlar jadvali (O'chirish imkoniyati bilan)
                 document.getElementById('admin-products-table').innerHTML = data.products.map(p => `
                     <tr class="hover:bg-slate-900/50">
                         <td class="p-3 font-mono text-xs">${p.id}</td>
