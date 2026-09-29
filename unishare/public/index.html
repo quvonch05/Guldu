@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniShare — Talabalar Bozor Tizimi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col justify-between">
+
+    <div>
+        <!-- Navbar -->
+        <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+            <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl font-black text-indigo-600 tracking-tight">UniShare</span>
+                    <span class="text-xs bg-indigo-100 text-indigo-800 font-semibold px-2 py-0.5 rounded">Talaba Portali</span>
+                </div>
+                <div class="flex items-center space-x-5">
+                    <div class="text-right">
+                        <div class="text-xs text-slate-400">Joriy hisob:</div>
+                        <div class="font-bold text-emerald-600 text-base" id="balance-display">Yuklanmoqda...</div>
+                    </div>
+                    <button onclick="topUpBalance()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2.5 rounded-lg shadow-sm transition">
+                        + To‘ldirish (Click)
+                    </button>
+                    <button onclick="openEscrowModal()" class="border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-semibold px-3 py-2.5 rounded-lg transition">
+                        Kodni tasdiqlash
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Asosiy qism -->
+        <main class="max-w-6xl mx-auto px-4 py-8">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                <div>
+                    <h1 class="text-2xl font-bold text-slate-900">Materiallar va Xizmatlar</h1>
+                    <p class="text-sm text-slate-500">Universitet talabalari uchun konspektlar, kitoblar va tezkor chop etish xizmati.</p>
+                </div>
+                <div class="flex space-x-2">
+                    <button class="px-3.5 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-medium">Barchasi</button>
+                </div>
+            </div>
+
+            <!-- Mahsulotlar kartasi -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="products-container">
+                <div class="col-span-3 text-center py-12 text-slate-400 text-sm">Materiallar yuklanmoqda...</div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="bg-white border-t py-6 text-center text-xs text-slate-400">
+        UniShare — Talabalar uchun o‘zaro yordam va onlayn to‘lov platformasi
+    </footer>
+
+    <script>
+        const CURRENT_USER_ID = 1; // Standart sinov talabasi ID-si
+
+        // 1. Foydalanuvchi ma'lumotlarini yuklash
+        async function loadUser() {
+            try {
+                const res = await fetch('/api/auth.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'get_user', user_id: CURRENT_USER_ID })
+                });
+                const data = await res.json();
+                if(data.status === 'success') {
+                    document.getElementById('balance-display').innerText = Number(data.user.balance).toLocaleString('uz-UZ') + " so‘m";
+                }
+            } catch (e) {
+                console.error("Balansni yuklab bo‘lmadi", e);
+            }
+        }
+
+        // 2. Mahsulotlarni chiqarish
+        async function loadProducts() {
+            try {
+                const res = await fetch('/api/get_products.php');
+                const data = await res.json();
+                const container = document.getElementById('products-container');
+                container.innerHTML = '';
+
+                if (data.status === 'success' && data.data.length > 0) {
+                    data.data.forEach(p => {
+                        let typeBadge = '';
+                        let btnText = 'Xarid qilish';
+                        let btnColor = 'bg-indigo-600 hover:bg-indigo-700';
+
+                        if (p.type === 'digital_note') {
+                            typeBadge = '<span class="px-2 py-0.5 bg-blue-50 text-blue-700 text-[11px] font-semibold rounded">PDF Konspekt</span>';
+                            btnText = 'Yuklab olish';
+                        } else if (p.type === 'print_service') {
+                            typeBadge = '<span class="px-2 py-0.5 bg-purple-50 text-purple-700 text-[11px] font-semibold rounded">Dorm-Print</span>';
+                            btnText = 'Chop etishga berish';
+                        } else {
+                            typeBadge = '<span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[11px] font-semibold rounded">Escrow Kitob</span>';
+                            btnText = 'Xavfsiz xarid';
+                            btnColor = 'bg-emerald-600 hover:bg-emerald-700';
+                        }
+
+                        container.innerHTML += `
+                            <div class="bg-white rounded-xl border border-slate-200 p-5 flex flex-col justify-between hover:shadow-md transition">
+                                <div>
+                                    <div class="mb-2">${typeBadge}</div>
+                                    <h3 class="font-bold text-slate-800 text-base mb-1.5">${p.title}</h3>
+                                    <p class="text-xs text-slate-500 mb-4 leading-relaxed">${p.description || ''}</p>
+                                </div>
+                                <div class="border-t border-slate-100 pt-3 flex items-center justify-between">
+                                    <span class="font-bold text-slate-900">${Number(p.price).toLocaleString('uz-UZ')} so‘m</span>
+                                    <button onclick="buyProduct(${p.id})" class="${btnColor} text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition">
+                                        ${btnText}
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    container.innerHTML = '<div class="col-span-3 text-center py-8 text-slate-400">Hozircha hech qanday e’lon yo‘q.</div>';
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // 3. Xarid qilish
+        async function buyProduct(productId) {
+            if(!confirm("Ushbu xaridni tasdiqlaysizmi?")) return;
+
+            try {
+                const res = await fetch('/api/buy_product.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ buyer_id: CURRENT_USER_ID, product_id: productId })
+                });
+                const result = await res.json();
+
+                if (result.status === 'success') {
+                    alert(result.message);
+                    loadUser();
+                    if (result.download_url) {
+                        window.location.href = result.download_url;
+                    }
+                } else {
+                    alert("Xatolik: " + result.message);
+                }
+            } catch (err) {
+                alert("Server bilan ulanishda xatolik yuz berdi");
+            }
+        }
+
+        // 4. Balans to'ldirish (Click havolasi)
+        function topUpBalance() {
+            const amount = prompt("Qancha summa to‘ldirmoqchisiz (so‘m)?", "30000");
+            if (amount && Number(amount) > 1000) {
+                const serviceId = "12345"; // Click Merchant Service ID
+                const returnUrl = encodeURIComponent(window.location.origin);
+                window.location.href = `https://my.click.uz/services/pay?service_id=${serviceId}&merchant_id=${serviceId}&amount=${amount}&transaction_param=${CURRENT_USER_ID}&return_url=${returnUrl}`;
+            }
+        }
+
+        // 5. Sotuvchi uchun Escrow kodini kiritish oynasi
+        async function openEscrowModal() {
+            const code = prompt("Xaridordan olgan 8 belgili maxfiy kodni kiriting:");
+            if (!code) return;
+
+            try {
+                const res = await fetch('/api/confirm_order.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ seller_id: CURRENT_USER_ID, secret_code: code })
+                });
+                const result = await res.json();
+                alert(result.message);
+                if (result.status === 'success') {
+                    loadUser();
+                }
+            } catch (e) {
+                alert("Xatolik yuz berdi");
+            }
+        }
+
+        // Boshlang'ich yuklash
+        loadUser();
+        loadProducts();
+    </script>
+</body>
+</html>
