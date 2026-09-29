@@ -73,7 +73,7 @@
             <div class="max-w-2xl relative z-10">
                 <span class="px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-xs font-semibold uppercase tracking-wider mb-3 inline-block">Talabalar Ekotizimi</span>
                 <h1 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight mb-3">Talabalar uchun qulay, tezkor va xavfsiz birja</h1>
-                <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">Kitoblar, elektron konspektlar, texnikalar va talabalar xizmatlari. To‘g‘ridan-to‘g‘ri qurilmadan fayl yuklash va xavfsiz xarid.</p>
+                <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">Kitoblar, elektron konspektlar, texnikalar va talabalar xizmatlari. To‘g‘ridan-to‘g‘ri fayl yuklash va xavfsiz xarid qilish tizimi.</p>
             </div>
             <div class="absolute right-4 -bottom-6 opacity-20 lg:opacity-30 motion-float pointer-events-none">
                 <i class="fa-solid fa-cube text-8xl sm:text-9xl text-indigo-400"></i>
@@ -98,7 +98,7 @@
                 </div>
             </div>
 
-            <!-- E'lonlar gridi (Ko'p e'lon bo'lsa ham qat'iy moslashuvchan) -->
+            <!-- E'lonlar gridi -->
             <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 min-h-[300px]"></div>
         </div>
 
@@ -202,7 +202,7 @@
                         <h3 class="text-base font-bold text-slate-200 flex items-center gap-2">
                             <i class="fa-solid fa-sliders text-emerald-400"></i> To‘lov Shlyuzlari
                         </h3>
-                        <p class="text-[11px] text-slate-400 mt-1">Click & Payme integratsiya kalitlari</p>
+                        <p class="text-[11px] text-slate-400 mt-1">Click & Payme API kalitlari</p>
                         <div class="space-y-2 mt-3">
                             <input id="click_service_id" type="text" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1 text-xs focus:outline-none" placeholder="Click Service ID">
                             <input id="click_merchant_id" type="text" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1 text-xs focus:outline-none" placeholder="Click Merchant ID">
@@ -350,7 +350,7 @@
         </div>
     </div>
 
-    <!-- Modal: E'lon berish (Qurilmadan fayl yuklash imkoniyati bilan) -->
+    <!-- Modal: E'lon berish (Qurilmadan fayl yuklash) -->
     <div id="post-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center hidden p-4">
         <div class="glass-dark w-full max-w-lg p-6 sm:p-8 rounded-3xl border border-indigo-500/30 shadow-2xl relative max-h-[90vh] overflow-y-auto custom-scroll">
             <button onclick="closeModal('post-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -591,7 +591,15 @@
                     method: 'POST',
                     body: formData
                 });
-                const data = await res.json();
+                
+                const text = await res.text();
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch(err) {
+                    throw new Error("Server xatosi: " + text.substring(0, 100));
+                }
+
                 if (data.status === 'success') {
                     alert(data.message);
                     closeModal('post-modal');
@@ -604,10 +612,10 @@
                     document.getElementById('post_image_url').value = '';
                     loadProducts();
                 } else {
-                    alert(data.message || 'Xatolik!');
+                    alert(data.message || 'Xatolik yuz berdi!');
                 }
             } catch (e) {
-                alert('Faylni yuklashda xatolik yuz berdi!');
+                alert(e.message || 'Faylni yuklashda xatolik yuz berdi!');
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Joylashtirish';
