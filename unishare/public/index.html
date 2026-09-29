@@ -73,7 +73,7 @@
             <div class="max-w-2xl relative z-10">
                 <span class="px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-xs font-semibold uppercase tracking-wider mb-3 inline-block">Talabalar Ekotizimi</span>
                 <h1 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight mb-3">Talabalar uchun qulay, tezkor va xavfsiz birja</h1>
-                <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">Kitoblar, elektron konspektlar, texnikalar va talabalar xizmatlari. To‘g‘ridan-to‘g‘ri fayl yuklash va xavfsiz xarid qilish tizimi.</p>
+                <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">Kitoblar, elektron konspektlar, texnikalar va talabalar xizmatlari. To‘g‘ridan-to‘g‘ri qurilmadan fayl yuklash va xavfsiz xarid qilish tizimi.</p>
             </div>
             <div class="absolute right-4 -bottom-6 opacity-20 lg:opacity-30 motion-float pointer-events-none">
                 <i class="fa-solid fa-cube text-8xl sm:text-9xl text-indigo-400"></i>
@@ -98,7 +98,6 @@
                 </div>
             </div>
 
-            <!-- E'lonlar gridi -->
             <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 min-h-[300px]"></div>
         </div>
 
@@ -350,7 +349,7 @@
         </div>
     </div>
 
-    <!-- Modal: E'lon berish (Qurilmadan fayl yuklash) -->
+    <!-- Modal: E'lon berish -->
     <div id="post-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center hidden p-4">
         <div class="glass-dark w-full max-w-lg p-6 sm:p-8 rounded-3xl border border-indigo-500/30 shadow-2xl relative max-h-[90vh] overflow-y-auto custom-scroll">
             <button onclick="closeModal('post-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -383,7 +382,7 @@
                         <i class="fa-solid fa-file-arrow-up"></i> Sotilayotgan Kitob yoki Fayl (Qurilmadan)
                     </label>
                     <input id="post_device_file" type="file" class="w-full text-xs text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer">
-                    <div class="text-[10px] text-slate-400">Yoki havola (Google Drive/Telegram link):</div>
+                    <div class="text-[10px] text-slate-400">Yoki havola (Google Drive / Telegram link):</div>
                     <input id="post_file_url" type="text" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs focus:border-indigo-500 focus:outline-none" placeholder="https://drive.google.com/...">
                 </div>
 
@@ -684,7 +683,7 @@
                         </div>
                         <div class="flex sm:flex-col items-end justify-between w-full sm:w-auto gap-2">
                             <span class="text-emerald-400 font-bold text-sm">${parseFloat(o.paid_amount).toLocaleString()} UZS</span>
-                            <a href="${downloadTarget}" target="_blank" rel="noopener noreferrer" download class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-lg transition">
+                            <a href="${downloadTarget}" target="_blank" rel="noopener noreferrer" download="${o.title}" class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-lg transition">
                                 <i class="fa-solid fa-cloud-arrow-down"></i> Faylni yuklab olish
                             </a>
                         </div>
