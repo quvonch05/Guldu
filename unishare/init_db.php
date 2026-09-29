@@ -41,11 +41,12 @@ try {
         FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
+    
     // 4. billing_transactions jadvali (Click / Payme uchun)
     $pdo->exec("CREATE TABLE IF NOT EXISTS billing_transactions (
         id INT AUTO_INCREMENT PRIMARY KEY,
         user_id INT NOT NULL,
-        system ENUM('click', 'payme') NOT NULL,
+        `system` ENUM('click', 'payme') NOT NULL,
         transaction_id VARCHAR(100) UNIQUE NOT NULL,
         amount DECIMAL(12, 2) NOT NULL,
         status ENUM('pending', 'completed', 'cancelled') DEFAULT 'pending',
