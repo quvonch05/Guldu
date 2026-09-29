@@ -20,7 +20,7 @@ if ($action === 'register') {
     $hash = password_hash($password, PASSWORD_BCRYPT);
 
     try {
-        $stmt = $pdo->prepare("INSERT INTO users (full_name, student_id, phone, password_hash) VALUES (?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO users (full_name, student_id, phone, password) VALUES (?, ?, ?, ?)");
         $stmt->execute([$full_name, $student_id, $phone, $hash]);
         echo json_encode(['status' => 'success', 'message' => 'Ro‘yxatdan o‘tish muvaffaqiyatli yakunlandi']);
     } catch (PDOException $e) {
@@ -37,8 +37,11 @@ if ($action === 'login') {
     $stmt->execute([$student_id]);
     $user = $stmt->fetch();
 
-    if ($user && password_verify($password, $user['password_hash'])) {
-        unset($user['password_hash']);
+    // password_hash o'rniga password tekshiriladi
+    $storedHash = $user['password'] ?? ($user['password_hash'] ?? '');
+
+    if ($user && password_verify($password, $storedHash)) {
+        unset($user['password'], $user['password_hash']);
         echo json_encode(['status' => 'success', 'user' => $user]);
     } else {
         echo json_encode(['status' => 'error', 'message' => 'Talaba ID yoki parol noto‘g‘ri']);
@@ -48,7 +51,7 @@ if ($action === 'login') {
 
 if ($action === 'get_user') {
     $user_id = (int)($data['user_id'] ?? 0);
-    $stmt = $pdo->prepare("SELECT id, full_name, student_id, phone, balance FROM users WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT id, full_name, student_id, phone, balance, role FROM users WHERE id = ?");
     $stmt->execute([$user_id]);
     $user = $stmt->fetch();
     if ($user) {
