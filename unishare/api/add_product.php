@@ -13,6 +13,20 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 try {
+    // 0. BAZADA file_url USTUNI BOR-YO'QLIGINI TEKSHIRISH VA AVTOMATIK QO'SHISH
+    try {
+        $checkCol = $pdo->query("SHOW COLUMNS FROM products LIKE 'file_url'")->fetch();
+        if (!$checkCol) {
+            $pdo->exec("ALTER TABLE products ADD COLUMN file_url LONGTEXT NULL AFTER image_url");
+        } else {
+            // Agar bor bo'lsa ham LONGTEXT ga o'tkazish
+            $pdo->exec("ALTER TABLE products MODIFY COLUMN file_url LONGTEXT NULL");
+        }
+        $pdo->exec("ALTER TABLE products MODIFY COLUMN image_url LONGTEXT NULL");
+    } catch (Exception $colErr) {
+        // Ignored
+    }
+
     $seller_id   = (int)($_POST['seller_id'] ?? 0);
     $title       = trim($_POST['title'] ?? '');
     $description = trim($_POST['description'] ?? '');
@@ -41,13 +55,13 @@ try {
         $image_url = 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500&q=80';
     }
 
-    // 2. Qurilmadan kitob/konspekt faylini Base64 shaklida olish (Render diski cheklovini aylanib o'tish)
+    // 2. Qurilmadan sotiladigan faylni Base64 shaklida olish
     if (isset($_FILES['product_file']) && $_FILES['product_file']['error'] === UPLOAD_ERR_OK) {
         $doc = $_FILES['product_file'];
 
         // Hajm tekshiruvi: 15 MB
         if ($doc['size'] > 15 * 1024 * 1024) {
-            echo json_encode(['status' => 'error', 'message' => 'Fayl hajmi 15 MB dan oshmasligi kerak! Katta hajmdagi fayllar uchun havola (link) maydonidan foydalaning.']);
+            echo json_encode(['status' => 'error', 'message' => 'Fayl hajmi 15 MB dan oshmasligi kerak! Katta fayllar uchun havola (link) maydonidan foydalaning.']);
             exit;
         }
 
@@ -67,7 +81,7 @@ try {
         $file_url = $image_url;
     }
 
-    // Bazaga xavfsiz saqlash
+    // Bazaga xavfsiz kiritish
     $stmt = $pdo->prepare("INSERT INTO products (seller_id, title, description, price, category, status, image_url, file_url) VALUES (?, ?, ?, ?, ?, 'active', ?, ?)");
     $stmt->execute([$seller_id, $title, $description, $price, $category, $image_url, $file_url]);
 
