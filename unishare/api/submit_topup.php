@@ -1,10 +1,22 @@
 <?php
-// unishare/api/submit_topup.php
+// unishare/public/api/submit_topup.php
 ini_set('display_errors', 0);
 error_reporting(E_ALL);
 
 header('Content-Type: application/json; charset=utf-8');
-require_once __DIR__ . '/../config/db.php';
+
+// Bazani xavfsiz ulash
+$dbPath1 = __DIR__ . '/../../config/db.php';$dbPath2 = __DIR__ . '/../config/db.php';
+
+if (file_exists($dbPath1)) {
+    require_once $dbPath1;
+} elseif (file_exists($dbPath2)) {
+    require_once $dbPath2;
+} else {
+    http_response_code(500);
+    echo json_encode(['status' => 'error', 'message' => 'db.php ulanmadi!']);
+    exit;
+}
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -15,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 try {
     $user_id = (int)($_POST['user_id'] ?? 0);
     $amount  = (float)($_POST['amount'] ?? 0);
-    $system  = trim($_POST['system'] ?? 'click');
+    $system  = trim($_POST['system'] ?? 'click_p2p');
 
     if (!$user_id \vert{}\vert{}$amount < 1000) {
         echo json_encode(['status' => 'error', 'message' => 'Summani to‘g‘ri kiriting (kamida 1,000 UZS)!']);
@@ -33,12 +45,17 @@ try {
     }
     $base64Image = 'data:' . $mime . ';base64,' . base64_encode($receiptData);
 
-    // Talaba ma'lumotlarini olish
+    // Foydalanuvchi ma'lumotlarini olish
     $uStmt =$pdo->prepare("SELECT full_name, student_id, phone FROM users WHERE id = ?");
     $uStmt->execute([$user_id]);
     $user =$uStmt->fetch(PDO::FETCH_ASSOC);
 
-    // So'rovni saqlash (`system` teskari tirnoqda)
+    if (!$user) {
+        echo json_encode(['status' => 'error', 'message' => 'Foydalanuvchi topilmadi!']);
+        exit;
+    }
+
+    // So'rovni bazaga yozish (`system` teskari tirnoqda)
     $stmt =$pdo->prepare("INSERT INTO topup_requests (user_id, amount, `system`, receipt_image, status) VALUES (?, ?, ?, ?, 'pending')");
     $stmt->execute([$user_id,$amount, $system,$base64Image]);
     $requestId =$pdo->lastInsertId();
@@ -77,6 +94,7 @@ try {
         curl_setopt($ch, CURLOPT_POSTFIELDS,$postData);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 15);
         curl_exec($ch);
         curl_close($ch);
     }
