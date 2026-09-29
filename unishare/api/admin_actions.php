@@ -1,5 +1,8 @@
 <?php
 // unishare/api/admin_actions.php
+ini_set('display_errors', 0);
+error_reporting(E_ALL);
+
 header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/../config/db.php';
 
@@ -15,40 +18,59 @@ $data = json_decode($rawInput, true);
 $action = $data['action'] ?? '';
 $admin_id = (int)($data['admin_id'] ?? 0);
 
-// Admin huquqini qat'iy tekshirish
-$stmt = $pdo->prepare("SELECT id, role, password FROM users WHERE id = ?");
-$stmt->execute([$admin_id]);
-$admin = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if (!$admin || $admin['role'] !== 'admin') {
-    http_response_code(403);
-    echo json_encode(['status' => 'error', 'message' => 'Ruxsat yo‘q! Faqat administratorlar uchun.']);
-    exit;
-}
-
 try {
-    // Tizim sozlamalari jadvalini ta'minlash
+    // Admin huquqini tekshirish
+    $stmt = $pdo->prepare("SELECT id, role, password FROM users WHERE id = ?");
+    $stmt->execute([$admin_id]);
+    $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$admin || $admin['role'] !== 'admin') {
+        echo json_encode(['status' => 'error', 'message' => 'Ruxsat yo‘q! Faqat administratorlar uchun.']);
+        exit;
+    }
+
+    // Sozlamalar jadvali mavjudligini ta'minlash
     $pdo->exec("CREATE TABLE IF NOT EXISTS system_settings (
         setting_key VARCHAR(50) PRIMARY KEY,
         setting_value TEXT
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
-    // 1. STATISTIKA VA RO'YXATLARNI OLISH
+    // 1. STATISTIKA VA RO'YXATLARNI REAL VAQTDA OLISH
     if ($action === 'get_stats') {
-        $usersCount = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
-        $productsCount = $pdo->query("SELECT COUNT(*) FROM products")->fetchColumn();
-        
+        // Talabalar soni
+        $usersCount = (int)$pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+
+        // Faol e'lonlar soni
+        $productsCount = (int)$pdo->query("SELECT COUNT(*) FROM products WHERE status = 'active'")->fetchColumn();
+
         // Umumiy savdo aylanmasi
-        $totalTurnover = $pdo->query("SELECT COALESCE(SUM(amount), 0) FROM orders WHERE status = 'completed'")->fetchColumn();
-        
-        // Admin balansi (komissiya tushumi)
+        $totalTurnover = (float)$pdo->query("SELECT COALESCE(SUM(amount), 0) FROM orders WHERE status = 'completed'")->fetchColumn();
+
+        // Admin hisobidagi sof foyda (komissiya)
         $adminBalStmt = $pdo->prepare("SELECT balance FROM users WHERE id = ?");
         $adminBalStmt->execute([$admin_id]);
-        $adminBalance = $adminBalStmt->fetchColumn();
+        $adminBalance = (float)$adminBalStmt->fetchColumn();
 
+        // Foydalanuvchilar ro'yxati
         $users = $pdo->query("SELECT id, student_id, full_name, phone, role, balance, created_at FROM users ORDER BY id DESC LIMIT 50")->fetchAll(PDO::FETCH_ASSOC);
-        $products = $pdo->query("SELECT p.*, COALESCE(u.full_name, 'Noma\'lum') AS author_name FROM products p LEFT JOIN users u ON (p.seller_id = u.id OR p.user_id = u.id) ORDER BY p.id DESC LIMIT 100")->fetchAll(PDO::FETCH_ASSOC);
-        
+
+        // E'lonlar ro'yxati (xavfsiz JOIN faqat seller_id orqali)
+        $products = $pdo->query("
+            SELECT 
+                p.id, 
+                p.title, 
+                p.category, 
+                p.price, 
+                p.status, 
+                p.created_at, 
+                COALESCE(u.full_name, 'Noma\'lum') AS author_name 
+            FROM products p 
+            LEFT JOIN users u ON p.seller_id = u.id 
+            ORDER BY p.id DESC 
+            LIMIT 100
+        ")->fetchAll(PDO::FETCH_ASSOC);
+
+        // Sozlamalar
         $settingsRows = $pdo->query("SELECT setting_key, setting_value FROM system_settings")->fetchAll(PDO::FETCH_ASSOC);
         $settings = [];
         foreach ($settingsRows as $row) {
@@ -60,11 +82,11 @@ try {
             'stats' => [
                 'users' => $usersCount,
                 'products' => $productsCount,
-                'turnover' => (float)$totalTurnover,
-                'admin_balance' => (float)$adminBalance
+                'turnover' => $totalTurnover,
+                'admin_balance' => $adminBalance
             ],
-            'users' => $users,
-            'products' => $products,
+            'users' => $users ?: [],
+            'products' => $products ?: [],
             'settings' => $settings
         ]);
         exit;
@@ -76,25 +98,25 @@ try {
         $new_password     = $data['new_password'] ?? '';
 
         if (!$current_password || !$new_password) {
-            throw new Exception("Barcha maydonlarni to‘ldiring!");
+            echo json_encode(['status' => 'error', 'message' => 'Barcha maydonlarni to‘ldiring!']);
+            exit;
         }
 
         if (strlen($new_password) < 6) {
-            throw new Exception("Yangi parol kamida 6 ta belgidan iborat bo‘lishi lozim!");
+            echo json_encode(['status' => 'error', 'message' => 'Yangi parol kamida 6 ta belgidan iborat bo‘lishi lozim!']);
+            exit;
         }
 
         if (!password_verify($current_password, $admin['password'])) {
-            throw new Exception("Joriy admin paroli noto‘g‘ri kiritildi!");
+            echo json_encode(['status' => 'error', 'message' => 'Joriy admin paroli noto‘g‘ri kiritildi!']);
+            exit;
         }
 
         $newHash = password_hash($new_password, PASSWORD_BCRYPT);
         $updateStmt = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
         $updateStmt->execute([$newHash, $admin_id]);
 
-        echo json_encode([
-            'status' => 'success',
-            'message' => 'Admin paroli muvaffaqiyatli o‘zgartirildi!'
-        ]);
+        echo json_encode(['status' => 'success', 'message' => 'Admin paroli muvaffaqiyatli yangilandi!']);
         exit;
     }
 
@@ -129,19 +151,20 @@ try {
         exit;
     }
 
-    // 5. ISTALGAN FOYDALANUVCHINING PAROLINI TIKLASH / O'ZGARTIRISH
+    // 5. TALABA PAROLINI TIKLASH / YANGILASH
     if ($action === 'reset_password') {
         $target_user_id = (int)($data['target_user_id'] ?? 0);
         $new_password   = $data['new_password'] ?? '';
 
         if (!$target_user_id || strlen($new_password) < 4) {
-            throw new Exception("Foydalanuvchi ID va kamida 4 belgili yangi parolni kiriting!");
+            echo json_encode(['status' => 'error', 'message' => 'Foydalanuvchi ID va kamida 4 belgili yangi parolni kiriting!']);
+            exit;
         }
 
         $hash = password_hash($new_password, PASSWORD_BCRYPT);
         $pdo->prepare("UPDATE users SET password = ? WHERE id = ?")->execute([$hash, $target_user_id]);
 
-        echo json_encode(['status' => 'success', 'message' => 'Foydalanuvchi paroli yangilandi!']);
+        echo json_encode(['status' => 'success', 'message' => 'Talaba paroli muvaffaqiyatli yangilandi!']);
         exit;
     }
 
@@ -151,21 +174,24 @@ try {
         $adminBal = (float)$pdo->query("SELECT balance FROM users WHERE id = {$admin_id}")->fetchColumn();
 
         if ($amount <= 0) {
-            throw new Exception("Yechish summasini to‘g‘ri kiriting!");
+            echo json_encode(['status' => 'error', 'message' => 'Yechish summasini to‘g‘ri kiriting!']);
+            exit;
         }
 
         if ($amount > $adminBal) {
-            throw new Exception("Admin balansida buncha mablag‘ mavjud emas!");
+            echo json_encode(['status' => 'error', 'message' => 'Admin balansida buncha mablag‘ mavjud emas!']);
+            exit;
         }
 
         $cardNum = $pdo->query("SELECT setting_value FROM system_settings WHERE setting_key = 'admin_card_number'")->fetchColumn();
         if (!$cardNum || strlen($cardNum) < 16) {
-            throw new Exception("Avval sozlamalardan admin kartasini to‘liq kiriting va saqlang!");
+            echo json_encode(['status' => 'error', 'message' => 'Avval sozlamalardan admin kartasini to‘liq kiriting va saqlang!']);
+            exit;
         }
 
         $pdo->beginTransaction();
         $pdo->prepare("UPDATE users SET balance = balance - ? WHERE id = ?")->execute([$amount, $admin_id]);
-        
+
         $payoutTxId = 'PAYOUT_' . time() . '_' . rand(100, 999);
         $pdo->prepare("INSERT INTO billing_transactions (user_id, `system`, transaction_id, amount, status) VALUES (?, 'click', ?, ?, 'completed')")
             ->execute([$admin_id, $payoutTxId, $amount]);
@@ -180,10 +206,9 @@ try {
 
     echo json_encode(['status' => 'error', 'message' => 'Noma’lum amal!']);
 
-} catch (Exception $e) {
-    if ($pdo->inTransaction()) {
+} catch (Throwable $e) {
+    if (isset($pdo) && $pdo->inTransaction()) {
         $pdo->rollBack();
     }
-    http_response_code(400);
-    echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+    echo json_encode(['status' => 'error', 'message' => 'Server xatosi: ' . $e->getMessage()]);
 }
