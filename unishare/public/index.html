@@ -32,7 +32,6 @@
     <!-- Navbar -->
     <nav class="sticky top-0 z-40 glass-dark border-b border-indigo-500/20 px-3 sm:px-8 py-3 shadow-xl">
         <div class="max-w-7xl mx-auto flex items-center justify-between gap-2">
-            <!-- Logo -->
             <div class="flex items-center gap-2 cursor-pointer select-none" onclick="switchView('catalog')">
                 <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
                     <i class="fa-solid fa-graduation-cap text-base sm:text-lg text-white"></i>
@@ -40,9 +39,8 @@
                 <span class="text-lg sm:text-2xl font-black tracking-tight bg-gradient-to-r from-white via-indigo-200 to-purple-300 bg-clip-text text-transparent">UniShare</span>
             </div>
 
-            <!-- Boshqaruv tugmalari va Balans -->
             <div class="flex items-center gap-1.5 sm:gap-3">
-                <!-- Foydalanuvchi Balansi (Telefonda ham, Kompyuterda ham Aniq Ko'rinadi) -->
+                <!-- Balans Badge -->
                 <div id="user-balance-badge" class="hidden flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/40">
                     <i class="fa-solid fa-wallet text-emerald-400 text-xs sm:text-sm"></i>
                     <div class="text-left">
@@ -83,14 +81,14 @@
             <div class="max-w-2xl relative z-10">
                 <span class="px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-xs font-semibold uppercase tracking-wider mb-3 inline-block">Talabalar Ekotizimi</span>
                 <h1 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight mb-3">Talabalar uchun qulay, tezkor va xavfsiz birja</h1>
-                <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">Kitoblar, elektron konspektlar va talabalar xizmatlari. To‘g‘ridan-to‘g‘ri qurilmadan yuklash va Telegram orqali bir zumda balans to‘ldirish.</p>
+                <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">Kitoblar, elektron konspektlar va xizmatlar. To‘g‘ridan-to‘g‘ri qurilmadan yuklash va qulay to‘lovlar.</p>
             </div>
             <div class="absolute right-4 -bottom-6 opacity-20 lg:opacity-30 motion-float pointer-events-none">
                 <i class="fa-solid fa-cube text-8xl sm:text-9xl text-indigo-400"></i>
             </div>
         </div>
 
-        <!-- Katalog va Qidiruv / Filtr qismi -->
+        <!-- Katalog va Qidiruv -->
         <div id="catalog-section" class="space-y-6">
             <div class="flex flex-col sm:flex-row gap-3 items-center justify-between">
                 <div class="relative w-full sm:w-80">
@@ -118,7 +116,7 @@
                     <h2 class="text-2xl sm:text-3xl font-black text-amber-400 flex items-center gap-2">
                         <i class="fa-solid fa-gauge-high"></i> Tizim Boshqaruv Markazi
                     </h2>
-                    <p class="text-slate-400 text-xs sm:text-sm">E'lonlar nazorati, moliyaviy aylanma va Telegram to‘lov boti</p>
+                    <p class="text-slate-400 text-xs sm:text-sm">E'lonlar nazorati va Telegram to‘lov boti</p>
                 </div>
                 <button onclick="switchView('catalog')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs sm:text-sm font-semibold transition">
                     ← Katalogga qaytish
@@ -150,7 +148,7 @@
                 </div>
                 <div class="glass-dark p-5 rounded-2xl border border-amber-500/30 flex items-center justify-between bg-amber-500/5">
                     <div>
-                        <div class="text-amber-300 text-xs font-medium">Admin Foydasi (5% Komissiya)</div>
+                        <div class="text-amber-300 text-xs font-medium">Admin Foydasi (5%)</div>
                         <div id="stat-admin-balance" class="text-xl sm:text-2xl font-black mt-1 text-amber-400">0 UZS</div>
                     </div>
                     <i class="fa-solid fa-coins text-amber-400 text-2xl"></i>
@@ -159,13 +157,13 @@
 
             <!-- Boshqaruv Asboblari Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- 1. Admin Kartasi & Payout -->
+                <!-- 1. Admin Kartasi -->
                 <div class="glass-dark p-5 rounded-3xl border border-amber-500/30 shadow-xl space-y-3 flex flex-col justify-between">
                     <div>
                         <h3 class="text-base font-bold text-amber-300 flex items-center gap-2">
                             <i class="fa-solid fa-credit-card"></i> Admin Kartasi & Payout
                         </h3>
-                        <p class="text-[11px] text-slate-400 mt-1">Talabalardan to‘lov qabul qiluvchi shaxsiy kartangiz</p>
+                        <p class="text-[11px] text-slate-400 mt-1">Talabalar to‘lov qiluvchi karta raqami</p>
                         <div class="space-y-2 mt-3">
                             <div>
                                 <label class="text-[10px] text-slate-400">Karta raqami (16 xonali)</label>
@@ -193,7 +191,7 @@
                         <h3 class="text-base font-bold text-sky-300 flex items-center gap-2">
                             <i class="fa-brands fa-telegram text-sky-400"></i> Telegram To‘lov Boti
                         </h3>
-                        <p class="text-[11px] text-slate-400 mt-1">To‘lov cheklarini 1-klikda tasdiqlash boti</p>
+                        <p class="text-[11px] text-slate-400 mt-1">To‘lov cheklarini tasdiqlash boti</p>
                         <div class="space-y-2 mt-3">
                             <div>
                                 <label class="text-[10px] text-slate-400">Bot Token</label>
@@ -214,9 +212,9 @@
                 <div class="glass-dark p-5 rounded-3xl border border-rose-500/30 shadow-xl space-y-3 flex flex-col justify-between">
                     <div>
                         <h3 class="text-base font-bold text-rose-300 flex items-center gap-2">
-                            <i class="fa-solid fa-lock text-rose-400"></i> Admin Parolini Yangilash
+                            <i class="fa-solid fa-lock text-rose-400"></i> Admin Paroli
                         </h3>
-                        <p class="text-[11px] text-slate-400 mt-1">Admin hisobi xavfsizligini ta'minlash</p>
+                        <p class="text-[11px] text-slate-400 mt-1">Admin hisobi xavfsizligi</p>
                         <div class="space-y-2 mt-3">
                             <input id="admin_current_pass" type="password" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs focus:outline-none" placeholder="Joriy parol">
                             <input id="admin_new_pass" type="password" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs focus:outline-none" placeholder="Yangi parol (min. 6)">
@@ -224,7 +222,7 @@
                         </div>
                     </div>
                     <button onclick="changeAdminPassword()" class="w-full py-2 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 text-[11px] font-bold text-white transition shadow-lg">
-                        Admin Parolini Saqlash
+                        Saqlash
                     </button>
                 </div>
 
@@ -232,9 +230,9 @@
                 <div class="glass-dark p-5 rounded-3xl border border-slate-700/80 shadow-xl space-y-3 flex flex-col justify-between">
                     <div>
                         <h3 class="text-base font-bold text-slate-200 flex items-center gap-2">
-                            <i class="fa-solid fa-key text-indigo-400"></i> Talaba Parolini Yangilash
+                            <i class="fa-solid fa-key text-indigo-400"></i> Talaba Parolini Tiklash
                         </h3>
-                        <p class="text-[11px] text-slate-400 mt-1">Parolini unutgan talabaga yangi parol berish</p>
+                        <p class="text-[11px] text-slate-400 mt-1">Parolini unutgan talabaga yordam</p>
                         <div class="space-y-2.5 mt-3">
                             <div>
                                 <label class="text-[10px] text-slate-400">Foydalanuvchi ID</label>
@@ -255,7 +253,7 @@
             <!-- E'lonlarni boshqarish jadvali -->
             <div class="glass-dark p-5 sm:p-6 rounded-3xl border border-slate-700/80">
                 <h3 class="text-lg font-bold mb-4 flex items-center gap-2 text-slate-100">
-                    <i class="fa-solid fa-boxes-stacked text-purple-400"></i> Barcha E'lonlarni Nazorat Qilish va O‘chirish
+                    <i class="fa-solid fa-boxes-stacked text-purple-400"></i> Barcha E'lonlarni Boshqarish
                 </h3>
                 <div class="overflow-x-auto custom-scroll">
                     <table class="w-full text-left text-xs sm:text-sm text-slate-300">
@@ -284,7 +282,7 @@
             <h3 class="text-xl sm:text-2xl font-bold mb-1 text-purple-300 flex items-center gap-2">
                 <i class="fa-solid fa-bag-shopping"></i> Mening Xaridlarim
             </h3>
-            <p class="text-xs text-slate-400 mb-5">Sotib olingan barcha materiallar, konspekt fayllari va sotuvchi bilan bog‘lanish</p>
+            <p class="text-xs text-slate-400 mb-5">Sotib olingan barcha materiallar va fayllar</p>
             <div id="my-orders-container" class="space-y-3 overflow-y-auto pr-2 flex-1 custom-scroll"></div>
         </div>
     </div>
@@ -323,7 +321,7 @@
                     <button onclick="setTopupAmount(100000)" class="flex-1 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs hover:border-emerald-500 transition">+100k</button>
                 </div>
 
-                <!-- Ilovalarda bitta bosishda to'lash: Click, Payme, Uzum Bank -->
+                <!-- Ilovalarda to'lash -->
                 <div class="space-y-1.5 pt-1">
                     <div class="text-[11px] text-slate-400 font-medium">To‘lov ilovasini tanlang:</div>
                     <div class="grid grid-cols-3 gap-2">
@@ -458,13 +456,13 @@
             if (saved) {
                 currentUser = JSON.parse(saved);
                 renderUserUI();
-                startBalanceAutoSync(); // Balansni fonda yangilab turish
+                startBalanceAutoSync();
             }
             loadProducts();
             fetchPublicSettings();
         });
 
-        // Balansni avtomatik yangilash (Har 6 soniyada tekshiradi, Telegramda tasdiqlansa avtomatik oshadi)
+        // Balansni fonda yangilab turish
         function startBalanceAutoSync() {
             if (!currentUser) return;
             setInterval(async () => {
@@ -657,6 +655,7 @@
             document.getElementById('payme-deeplink').href = `https://payme.uz/fallback/p2p/${card}/${amt}`;
         }
 
+        // To'lov chekini xavfsiz yuborish
         async function submitTopupRequest() {
             if (!currentUser) return alert('Avval tizimga kiring!');
             const amount = parseFloat(document.getElementById('topup_amount').value);
@@ -680,7 +679,15 @@
                     method: 'POST',
                     body: formData
                 });
-                const data = await res.json();
+                
+                const rawText = await res.text();
+                let data;
+                try {
+                    data = JSON.parse(rawText);
+                } catch (parseErr) {
+                    throw new Error("Server xatoligi: " + rawText.substring(0, 200));
+                }
+
                 if (data.status === 'success') {
                     alert(data.message);
                     closeModal('topup-modal');
@@ -690,7 +697,7 @@
                     alert(data.message || 'Xatolik yuz berdi!');
                 }
             } catch(e) {
-                alert('Chekni yuborishda xato yuz berdi!');
+                alert(e.message || 'Chekni yuborishda xato yuz berdi!');
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Chekni yuborish';
@@ -925,7 +932,6 @@
             document.getElementById('admin-section').classList.toggle('hidden', view !== 'admin');
         }
 
-        // Admin Boshqaruv Markazi
         async function openAdminPanel() {
             if (!currentUser || currentUser.role !== 'admin') return alert('Ruxsat yo‘q!');
             switchView('admin');
