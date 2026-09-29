@@ -16,7 +16,7 @@ try {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
-    // 2. products jadvali
+    // 2. products jadvali (file_url va image_url katta fayllar uchun LONGTEXT qilinadi)
     $pdo->exec("CREATE TABLE IF NOT EXISTS products (
         id INT AUTO_INCREMENT PRIMARY KEY,
         seller_id INT NOT NULL,
@@ -24,16 +24,17 @@ try {
         description TEXT,
         price DECIMAL(12, 2) NOT NULL,
         category VARCHAR(100) DEFAULT 'Kitoblar',
-        image_url VARCHAR(500) NULL,
-        file_url VARCHAR(500) NULL,
+        image_url LONGTEXT NULL,
+        file_url LONGTEXT NULL,
         status ENUM('active', 'sold', 'deleted') DEFAULT 'active',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (seller_id) REFERENCES users(id) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
-    // Agar jadval avval yaratilgan bo'lsa, file_url ustunini xavfsiz qo'shish
+    // Ustunlarni xavfsiz yangilash (agar avval VARCHAR bo'lgan bo'lsa)
     try {
-        $pdo->exec("ALTER TABLE products ADD COLUMN IF NOT EXISTS file_url VARCHAR(500) NULL AFTER image_url;");
+        $pdo->exec("ALTER TABLE products MODIFY COLUMN file_url LONGTEXT NULL;");
+        $pdo->exec("ALTER TABLE products MODIFY COLUMN image_url LONGTEXT NULL;");
     } catch (Exception $e) {}
 
     // 3. orders jadvali
@@ -48,7 +49,7 @@ try {
         FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
-    // 4. billing_transactions jadvali (`system` himoyalangan so'zi bilan)
+    // 4. billing_transactions jadvali
     $pdo->exec("CREATE TABLE IF NOT EXISTS billing_transactions (
         id INT AUTO_INCREMENT PRIMARY KEY,
         user_id INT NOT NULL,
@@ -60,13 +61,13 @@ try {
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
-    // 5. system_settings jadvali (Admin kartasi va billing sozlamalari)
+    // 5. system_settings jadvali
     $pdo->exec("CREATE TABLE IF NOT EXISTS system_settings (
         setting_key VARCHAR(50) PRIMARY KEY,
         setting_value TEXT
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
-    // ADMIN01 profilini tekshirish va kiritish
+    // ADMIN01 profilini ta'minlash
     $checkAdmin =$pdo->prepare("SELECT id FROM users WHERE student_id = ?");
     $checkAdmin->execute(['ADMIN01']);
     
@@ -75,12 +76,13 @@ try {
         $insertAdmin->execute(['Bosh Administrator', 'ADMIN01', '+998900000000',$adminPass]);
     }
 
-    echo "<h2 style='color: green; font-family: sans-serif; text-align: center; margin-top: 50px;'>
-            Barcha jadvallar (users, products, orders, billing, settings) muvaffaqiyatli tayyorlandi va ADMIN01 profili sozlandi!
-          </h2>";
+    echo "<div style='font-family: sans-serif; text-align: center; margin-top: 50px;'>
+            <h2 style='color: #10b981;'>Ma'lumotlar bazasi to‘liq tayyorlandi!</h2>
+            <p style='color: #475569;'>LONGTEXT ustunlari faollashtirildi va ADMIN01 tekshirildi.</p>
+          </div>";
 
 } catch (PDOException $e) {
-    echo "<h2 style='color: red; font-family: sans-serif; text-align: center; margin-top: 50px;'>
-            Xatolik yuz berdi: " . htmlspecialchars($e->getMessage()) . "
+    echo "<h2 style='color: #ef4444; font-family: sans-serif; text-align: center; margin-top: 50px;'>
+            Xatolik: " . htmlspecialchars($e->getMessage()) . "
           </h2>";
 }
